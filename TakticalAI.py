@@ -1,0 +1,3 @@
+class TakticalAI:
+    #todo
+    pass
