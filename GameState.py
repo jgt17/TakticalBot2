@@ -1,5 +1,6 @@
 from Stack import Stack
 from MoveSpecification import MoveSpecification
+from FlatBoard import FlatBoard
 
 
 class GameState:
@@ -18,9 +19,9 @@ class GameState:
         if board.isNone():
             board = [[Stack() for _ in range(boardSize)] for _ in range(boardSize)]
         self.__board = board
-        self.__boardSize = len(board)
-        self.__turnCount = turnCount
-        self.__turnIndicator = turnCount % 2*-2+1       # 1 for white's turn, 0 for black's
+        self.boardSize = len(board)
+        self.turnCount = turnCount
+        self.turnIndicator = turnCount % 2*-2+1       # 1 for white's turn, 0 for black's
         self.previousMoves = []
 
         self.__whitePiecesPlayed = self.countWhiteStonesOnBoard()
@@ -31,7 +32,7 @@ class GameState:
         self.__blackPiecesRemaining = GameState.piecesAvailable[boardSize] - self.__blackPiecesPlayed
         self.__blackCapstonesAvailable = self.countBlackCapstonesOnBoard() - GameState.capstonesAvailable[boardSize]
 
-        self.__carryLimit = self.__boardSize
+        self.__carryLimit = self.boardSize
 
     # applies a move, given a move specification string
     # enforces tak rules
@@ -48,7 +49,17 @@ class GameState:
             elif not self.__inBounds(file, rank):
                 raise Exception("The location", file, ",", rank, "is not on the board")
             else:
-                position.place(toPlace*self.__turnIndicator)
+                position.place(toPlace*self.turnIndicator)
+                if toPlace % 3 == 0 and self.turnIndicator == 1:
+                    self.__whiteCapstonesAvailable -= 1
+                elif toPlace % 3 == 0 and self.turnIndicator == -1:
+                    self.__blackCapstonesAvailable -= 1
+                elif self.turnIndicator == 1:
+                    self.__whitePiecesPlayed += 1
+                    self.__whitePiecesRemaining -= 1
+                else:
+                    self.__blackPiecesPlayed += 1
+                    self.__blackPiecesRemaining -= 1
             self.previousMoves.append(moveSpecificationString)
         # movement moves
         else:
@@ -84,20 +95,20 @@ class GameState:
                         raise Exception("Cannot drop tiles onto (", file, ",", rank, "), it is off the board")
                     self.__board[file][rank].place(dropCounts.pop(0), movingStack)
                 self.previousMoves.append(moveSpecificationString)
-        self.__turnIndicator *= -1
+        self.turnIndicator *= -1
         pass
 
-    # checks whether a player has won returns 1 if white won, -1 if black won, and 0 if neither has won
+    # checks whether a player has won
+    # returns 1 if white won, -1 if black won, 0 if it is a draw, and 2 if the game isn't over
     def checkVictory(self):
-        # todo
-        pass
+        return FlatBoard(self).checkVictory()
 
     # returns a list of all possible moves
     def generateMoves(self):
         # todo
         pass
 
-    # returns evalation of the quality of the board for white
+    # returns evaluation of the quality of the board for white
     def score(self):
         # todo
         pass
@@ -142,6 +153,15 @@ class GameState:
 
     #counts the number of black capstones on the board
     def countBlackCapstonesOnBoard(self):
+        # todo
+        return 0
+
+    # counts the number of flatstones white has
+    def countWhiteFlatstones(self):
+        # todo
+        return 0
+
+    def countBlackFlatstones(self):
         # todo
         return 0
 
