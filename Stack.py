@@ -78,6 +78,12 @@ class Stack:
     def __bool__(self):
         return bool(self.__pieces)
 
+    # reeturns an inverted version of the stack, swapping the players
+    def invert(self):
+        new = copy(self)
+        new.__pieces = [-1 * piece for piece in new.__pieces]
+        return new
+
     @staticmethod
     def isFlatStone(piece):
         return piece == Stack.__blackFlatStone or piece == Stack.__whiteFlatStone
