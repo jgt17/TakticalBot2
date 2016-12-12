@@ -1,4 +1,5 @@
 from copy import copy
+from TakException import TakException
 
 
 class Stack:
@@ -29,26 +30,26 @@ class Stack:
             number = 1
 
         if Stack.isCapstone(self.top()):
-            raise Exception("Tried to place a", str(stack), "on top of ", str(self.__pieces))
+            raise TakException("Tried to place a " + str(stack) + " on top of " + str(self.__pieces))
         elif Stack.isStandingStone(self.top()):
             if stack.height() == 1 and Stack.isCapstone(stack.top()):
                 self.flattenStandingStone()
-                self.__pieces.append(number)
+                self.__pieces += stack.__pieces
             else:
-                raise Exception("Tried to flatten a standing stone without a capstone")
+                raise TakException("Tried to flatten a standing stone without a capstone")
         else:
-            self.__pieces.append(stack.__peices[:number])  # if a stack is given, remove the bottom "number"
+            self.__pieces += stack.__pieces[:number]  # if a stack is given, remove the bottom "number"
             stack.__pieces = stack.__pieces[number:]  # from the stack and add them to this stack
-            return stack  # return the adjusted stack
+            return stack                              # return the adjusted stack
 
     # remove pieces from a stack, then return the removed pieces
     # does not enforce carry limit
     def lift(self, number=1):
         if number > len(self.__pieces):
-            raise Exception("Tried to pull", str(number), "pieces from ", str(self.__pieces))
-        lifted = self.__pieces
+            raise TakException("Tried to pull " + str(number) + " pieces from " + str(self.__pieces))
+        lifted = self.__pieces[-number:]
         self.__pieces = self.__pieces[:-number]
-        return lifted
+        return Stack(lifted)
 
     # returns the top piece on the stack, or 0 if the stack is empty
     def top(self):
@@ -64,9 +65,21 @@ class Stack:
     # flattens the standing stone at the top of a stack
     def flattenStandingStone(self):
         if Stack.isStandingStone(self.top()):
-            self.__pieces[-1] = self.top() / 2
+            self.__pieces[-1] = int(self.top() / 2)
         else:
-            raise Exception("Tried to flatten a ", self.top)
+            raise Exception("Tried to flatten a " + self.top)
+
+    def countStones(self):
+        whiteCount = 0
+        blackCount = 0
+
+        for piece in self.__pieces:
+            if piece == 1 or piece == 2:
+                whiteCount += 1
+            elif piece == -1 or piece == -2:
+                blackCount += 1
+
+        return whiteCount, blackCount
 
     def __str__(self):
         return str(self.__pieces)
@@ -95,3 +108,12 @@ class Stack:
     @staticmethod
     def isCapstone(piece):
         return piece == Stack.__blackCapstone or piece == Stack.__whiteCapstone
+
+    def pieces(self):
+        return self.__pieces
+
+    def __str__(self):
+        return str(self.__pieces)
+
+    def __repr__(self):
+        return str(self.__pieces)

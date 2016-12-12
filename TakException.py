@@ -1,0 +1,2 @@
+class TakException(Exception):
+    pass

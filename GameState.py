@@ -2,6 +2,7 @@ from Stack import Stack
 from MoveSpecification import MoveSpecification
 from FlatBoard import FlatBoard
 from Misc import compositions
+from TakException import TakException
 import string
 import copy
 
@@ -19,23 +20,30 @@ class GameState:
                  boardSize=5,
                  board=None,
                  turnCount=0):
-        if board.isNone():
+        if board is None:
             board = [[Stack() for _ in range(boardSize)] for _ in range(boardSize)]
-        self.__board = board
+        self.board = board
         self.boardSize = len(board)
         self.turnCount = turnCount
         self.turnIndicator = turnCount % 2*-2+1       # 1 for white's turn, 0 for black's
         self.previousMoves = []
 
-        self.__whitePiecesPlayed = self.countWhiteStonesOnBoard()
-        self.__whitePiecesRemaining = GameState.piecesAvailable[boardSize] - self.__whitePiecesPlayed
-        self.__whiteCapstonesAvailable = self.countWhiteCapstonesOnBoard() - GameState.capstonesAvailable[boardSize]
+        whiteStonesOnBoard, blackStonesOnBoard = self.countStonesOnBoard()
 
-        self.__blackPiecesPlayed = self.countBlackStonesOnBoard()
-        self.__blackPiecesRemaining = GameState.piecesAvailable[boardSize] - self.__blackPiecesPlayed
-        self.__blackCapstonesAvailable = self.countBlackCapstonesOnBoard() - GameState.capstonesAvailable[boardSize]
+        self.__whitePiecesPlayed = whiteStonesOnBoard
+        self.whitePiecesRemaining = GameState.piecesAvailable[boardSize] - self.__whitePiecesPlayed
+
+        self.__blackPiecesPlayed = blackStonesOnBoard
+        self.blackPiecesRemaining = GameState.piecesAvailable[boardSize] - self.__blackPiecesPlayed
 
         self.__carryLimit = self.boardSize
+
+        self.flatBoard = FlatBoard(self)
+        whiteCount, blackCount, whiteStandingCount, blackStandingCount, whiteCapstoneCount, blackCapstoneCount = \
+            self.flatBoard.getPieceCounts()
+
+        self.__whiteCapstonesAvailable = GameState.capstonesAvailable[boardSize] - whiteCapstoneCount
+        self.__blackCapstonesAvailable = GameState.capstonesAvailable[boardSize] - blackCapstoneCount
 
     # applies a move, given a move specification string
     # enforces tak rules
@@ -47,23 +55,29 @@ class GameState:
             file = moveSpecification.file
             rank = moveSpecification.rank
             toPlace = moveSpecification.whatToPlace
-            position = new.__board[file][rank]
+            if not new.__inBounds(file, rank):
+                raise TakException("The location " + str(file) + "," + str(rank) + " is not on the board")
+            position = new.board[file][rank]
             if position:
-                raise Exception("Tried to place in", file, ",", rank, ", which is already occupied")
-            elif not new.__inBounds(file, rank):
-                raise Exception("The location", file, ",", rank, "is not on the board")
+                raise TakException("Tried to place in " + str(file) + ", " + str(rank) + ", which is already occupied")
             else:
-                position.place(toPlace * new.turnIndicator)
+                # place for other player on first turn
+                if new.turnCount >= 2:
+                    position.place(toPlace * new.turnIndicator)
+                else:
+                    if abs(moveSpecification.whatToPlace) != 1:
+                        raise TakException("You must place a flatstone on the first turn")
+                    position.place(toPlace * new.turnIndicator * -1)
                 if toPlace % 3 == 0 and new.turnIndicator == 1:
                     new.__whiteCapstonesAvailable -= 1
                 elif toPlace % 3 == 0 and new.turnIndicator == -1:
                     new.__blackCapstonesAvailable -= 1
                 elif new.turnIndicator == 1:
                     new.__whitePiecesPlayed += 1
-                    new.__whitePiecesRemaining -= 1
+                    new.whitePiecesRemaining -= 1
                 else:
                     new.__blackPiecesPlayed += 1
-                    new.__blackPiecesRemaining -= 1
+                    new.blackPiecesRemaining -= 1
             new.previousMoves.append(moveSpecificationString)
         # movement moves
         else:
@@ -73,33 +87,35 @@ class GameState:
             direction = moveSpecification.direction
             dropCounts = moveSpecification.dropCounts
             if not new.__inBounds(file, rank):
-                raise Exception("Tried to move from (", file, ",", rank, "), which is out of bounds")
-            position = new.__board[file][rank]
+                raise TakException("Tried to move from " + str(file) + "," + str(rank) + ", which is out of bounds")
+            position = new.board[file][rank]
             if toMove > new.__carryLimit:
-                raise Exception("Tried to move",
-                                toMove,
-                                "pieces, which is greater than the carry limit",
-                                new.__carryLimit)
+                raise TakException("Tried to move " + str(toMove) + " pieces, which is greater than the carry limit" +
+                                   str(new.__carryLimit))
             elif toMove > len(position):
-                raise Exception("Tried to move", toMove, "pieces, which is more than (", file, ",", rank, ") has")
+                raise TakException("Tried to move " + str(toMove) + " pieces, which is more than " +
+                                   str(file) + "," + str(rank) + " has")
+            elif position.top() * new.turnIndicator < 0:
+                raise TakException("Tried to move " + str(file) + ", " + str(rank) + " which is not controlled by you")
             else:
                 movingStack = position.lift(toMove)
                 while dropCounts:
-                    if direction == "+":
+                    if direction == ">":
                         file += 1
-                    elif direction == "-":
-                        file -= 1
-                    elif direction == ">":
-                        rank += 1
                     elif direction == "<":
+                        file -= 1
+                    elif direction == "+":
+                        rank += 1
+                    elif direction == "-":
                         rank -= 1
                     else:
-                        raise Exception("invalid movement direction:", direction)
+                        raise TakException("invalid movement direction:", direction)
                     if not new.__inBounds(file, rank):
-                        raise Exception("Cannot drop tiles onto (", file, ",", rank, "), it is off the board")
-                    new.__board[file][rank].place(dropCounts.pop(0), movingStack)
+                        raise TakException("Cannot drop tiles onto " + str(file) + "," + str(rank) + ", it is off the board " + moveSpecificationString)
+                    new.board[file][rank].place(dropCounts.pop(0), movingStack)
                 new.previousMoves.append(moveSpecificationString)
         new.turnIndicator *= -1
+        new.turnCount += 1
         return new
 
     # checks whether a player has won
@@ -114,37 +130,43 @@ class GameState:
     # returns a list of all possible placement moves
     def __generatePlacementMoves(self):
         placementMoves = []
-        for i in self.__board:
-            for j in self.__board[i]:
+        for i in range(self.boardSize):
+            for j in range(self.boardSize):
                 # if the space is empty
-                if not self.__board[i][j]:
+                if not self.board[i][j]:
                     locString = self.__toLocString(i, j)
                     # assumes there are more flatstones
                     placementMoves.append(locString)
-                    placementMoves.append("S"+locString)
-                    if (self.turnIndicator == 1 and self.__whiteCapstonesAvailable > 0)\
-                            or (self.turnIndicator == -1 and self.__blackCapstonesAvailable > 0):
-                        placementMoves.append("C"+locString)
+                    if self.turnCount > 2:
+                        placementMoves.append("S"+locString)
+                        if (self.turnIndicator == 1 and self.__whiteCapstonesAvailable > 0)\
+                                or (self.turnIndicator == -1 and self.__blackCapstonesAvailable > 0):
+                            placementMoves.append("C"+locString)
         return placementMoves
 
+    # fixme: currently generates illegal moves (later pruned during applyMove during minimax, so not a huge issue)
     def __generateMovementMoves(self):
         movementMoves = []
         # for each space on the board
-        for i in self.__board:
-            for j in self.__board[i]:
-                stack = self.__board[i][j]
+        for i in range(self.boardSize):
+            for j in range(self.boardSize):
+                stack = self.board[i][j]
                 # if the space is not empty and is controlled by the current player
                 if stack and stack.top() * self.turnIndicator > 0:
-                    for toMove in range(max(self.__carryLimit, stack.height())):
-                        arrangements = compositions[toMove]
+                    for toMove in range(1, min(self.__carryLimit+1, stack.height()+1)):
+                        arrangements = compositions[toMove-1]
+                        flat = self.flatBoard.flatBoard
                         for arr in arrangements:
-                            if len(arr) < i:
+                            if len(arr) <= i:
                                 movementMoves.append(self.__moveStringGen(toMove, i, j, "<", arr))
-                            if len(arr) < self.boardSize - i - 1:
+
+                            if len(arr) <= self.boardSize - i - 1:
                                 movementMoves.append(self.__moveStringGen(toMove, i, j, ">", arr))
-                            if len(arr) < j:
+
+                            if len(arr) <= j:
                                 movementMoves.append(self.__moveStringGen(toMove, i, j, "-", arr))
-                            if len(arr) < self.boardSize - j - 1:
+
+                            if len(arr) <= self.boardSize - j - 1:
                                 movementMoves.append(self.__moveStringGen(toMove, i, j, "+", arr))
         return movementMoves
 
@@ -154,10 +176,13 @@ class GameState:
 
     @staticmethod
     def __moveStringGen(toMove, i, j, directionSymbol, dropCounts):
-        moveString = str(toMove) + GameState.__toLocString(i, j) + directionSymbol
-        for n in dropCounts:
-            moveString += n
-        return moveString
+        if toMove > 1:
+            moveString = str(toMove) + GameState.__toLocString(i, j) + directionSymbol
+            for n in dropCounts:
+                moveString += str(n)
+            return moveString
+        else:
+            return GameState.__toLocString(i, j) + directionSymbol
 
     # returns evaluation of the quality of the board for white
     def score(self):
@@ -187,28 +212,27 @@ class GameState:
 
     def __rotate(self):
         new = copy.deepcopy(self)
-        new.__board = [list(elem) for elem in list(zip(*new.__board[::-1]))]
+        new.board = [list(elem) for elem in list(zip(*new.board[::-1]))]
         return new
 
     def __flipHorizontal(self):
         new = copy.deepcopy(self)
-        new.__board = new.__board[::-1]
+        new.board = new.board[::-1]
         return new
 
     def __flipVertical(self):
         new = copy.deepcopy(self)
-        new.__board = [elem[::-1] for elem in new.__board]
+        new.board = [elem[::-1] for elem in new.board]
         return new
 
     def __invert(self):
         new = copy.deepcopy(self)
-        new.__board = [stack.invert() for file in new.__board for stack in file]
+        new.board = [stack.invert() for file in new.board for stack in file]
         return new
 
     # returns a string representation of the board in Tak Positional System (TPS) notation
     def toTPS(self):
-        # todo
-        pass
+        return str(self.board)
 
     # returns a GameState from a TPS string
     @staticmethod
@@ -216,38 +240,22 @@ class GameState:
         # todo
         pass
 
-    # counts the number of white stones on the board
-    def countWhiteStonesOnBoard(self):
-        # todo
-        self
-        return 0
+    # counts the number of flatstones on the board, including those buried in stacks
+    def countStonesOnBoard(self):
+        whiteTotalCount = 0
+        blackTotalCount = 0
 
-    # counts the number of black stones on the board
-    def countBlackStonesOnBoard(self):
-        # todo
-        self
-        return 0
+        for file in self.board:
+            for stack in file:
+                w, b = stack.countStones()
+                whiteTotalCount += w
+                blackTotalCount += b
 
-    # counts the number of white capstones on the board
-    def countWhiteCapstonesOnBoard(self):
-        # todo
-        self
-        return 0
-
-    # counts the number of black capstones on the board
-    def countBlackCapstonesOnBoard(self):
-        # todo
-        return 0
-
-    # counts the number of flatstones white has
-    def countWhiteFlatstones(self):
-        # todo
-        return 0
-
-    def countBlackFlatstones(self):
-        # todo
-        return 0
+        return whiteTotalCount, blackTotalCount
 
     # checks if a location is on the board
     def __inBounds(self, file, rank):
-        return 0 <= file <= self.boardSize and 0 <= rank <= self.boardSize
+        return 0 <= file < self.boardSize and 0 <= rank < self.boardSize
+
+    def __str__(self):
+        return self.toTPS()

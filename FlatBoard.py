@@ -7,14 +7,16 @@ class FlatBoard:
 
     def __init__(self, gameState):
         self.flatBoard = [[0 for _ in range(gameState.boardSize)] for _ in range(gameState.boardSize)]
-        self.whitePiecesLeft = gameState.__whitePiecesRemaining
-        self.blackPiecesLeft = gameState.__blackPiecesRemaining
-        self.turnIndicator = gameState.__turnIndicator
+        self.whitePiecesLeft = gameState.whitePiecesRemaining
+        self.blackPiecesLeft = gameState.blackPiecesRemaining
+        self.turnIndicator = gameState.turnIndicator
         self.boardSize = gameState.boardSize
         for i in range(gameState.boardSize):
             for j in range(gameState.boardSize):
-                self.flatBoard[i][j] = gameState.__board[i][j].top()
+                self.flatBoard[i][j] = gameState.board[i][j].top()
+        self.winner = self.checkVictory()
 
+    # fixme
     def checkVictory(self):
         r = self.__checkRoadVictory()
         if r != 0:
@@ -41,15 +43,7 @@ class FlatBoard:
             return 2
 
     def __checkFlatVictory(self):
-        whiteCount = 0
-        blackCount = 0
-
-        for file in self.flatBoard:
-            for piece in file:
-                if piece == 1:
-                    whiteCount += 1
-                elif piece == -1:
-                    blackCount += 1
+        whiteCount, blackCount, _, _, _, _ = self.getPieceCounts()
 
         if whiteCount > blackCount:
             return 1
@@ -58,6 +52,31 @@ class FlatBoard:
         else:
             return 0
 
+    def getPieceCounts(self):
+        whiteCount = 0
+        blackCount = 0
+        whiteStandingCount = 0
+        blackStandingCount = 0
+        whiteCapstoneCount = 0
+        blackCapstoneCount = 0
+
+        for file in self.flatBoard:
+            for piece in file:
+                if piece == 1:
+                    whiteCount += 1
+                elif piece == -1:
+                    blackCount += 1
+                elif piece == 2:
+                    whiteStandingCount += 1
+                elif piece == -2:
+                    blackStandingCount += 1
+                elif piece == 3:
+                    whiteCapstoneCount += 1
+                elif piece == -3:
+                    blackCapstoneCount += 1
+
+        return whiteCount, blackCount, whiteStandingCount, blackStandingCount, whiteCapstoneCount, blackCapstoneCount
+
     def __boardIsCovered(self):
         for file in self.flatBoard:
             for piece in file:
@@ -65,14 +84,15 @@ class FlatBoard:
                     return False
         return True
 
+    # fixme
     def __roadExists(self, openset, size, direction, player):
-        closedSet = {}
+        closedSet = set()
         openSet = openset.copy()
         while openSet:
             curr = openSet.pop()
             if (direction == "horizontal" and curr[0] == size) or (direction == "vertical" and curr[1] == size):
                 return True
-            curr.add(closedSet)
+            closedSet.add(curr)
             adj = self.__getAdj(curr)
             for neighbor in adj:
                 piece = self.flatBoard[neighbor[0]][neighbor[1]]
@@ -89,9 +109,9 @@ class FlatBoard:
             adj.add((i + 1, j))
         if self.__inBounds(i, j - 1):
             adj.add((i, j - 1))
-        if self.__inBounds(i, j - 1):
-            adj.add((i, j - 1))
+        if self.__inBounds(i, j + 1):
+            adj.add((i, j + 1))
         return adj
 
     def __inBounds(self, file, rank):
-        return 0 <= file <= self.boardSize and 0 <= rank <= self.boardSize
+        return 0 <= file < self.boardSize and 0 <= rank < self.boardSize

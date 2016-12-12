@@ -19,10 +19,10 @@ class MoveSpecification:
                 self.file = self.fileLetterToIndex[moveSpecificationString[0]]
                 self.rank = int(moveSpecificationString[1])-1
                 self.direction = moveSpecificationString[2]
-                self.drops = [1]
+                self.dropCounts = [1]
             # if the number to move is specified
             else:
-                if moveSpecificationString[-1 not in string.digits]:
+                if moveSpecificationString[-1] not in (string.digits + "+-<>"):
                     moveSpecificationString = moveSpecificationString[:-1]
                 self.isPlacementMove = False
                 self.numberToMove = int(moveSpecificationString[0])
@@ -30,8 +30,11 @@ class MoveSpecification:
                 self.rank = int(moveSpecificationString[2]) - 1
                 self.direction = moveSpecificationString[3]
                 self.dropCounts = []
-                for num in moveSpecificationString[4:]:
-                    self.dropCounts.append(int(num))
+                if len(moveSpecificationString) > 4:
+                    for num in moveSpecificationString[4:]:
+                        self.dropCounts.append(int(num))
+                else:
+                    self.dropCounts.append(self.numberToMove)
         # if the move is a placement move
         else:
             # if the piece is specified
