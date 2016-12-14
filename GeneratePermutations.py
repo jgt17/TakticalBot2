@@ -16,16 +16,16 @@ def generatePermutations(games, r):
     for j in range(10):
         with open("PermutedGameStates/" + permutedGamesStatesFilename + "_" + str(r) + "_" + str(j), 'wb') as saveLoc:
             pickle.dump([permutedGameState
-                         for permutations in [progressUpdate(gameState.generatePermutations(), k, l, r)
+                         for permutations in [progressUpdate(gameState.generatePermutations(), k, l, r, j)
                                               for k, game in enumerate(games[j*blockSize:(j+1)*blockSize])
                                               for l, gameState in enumerate(game)]
                          for permutedGameState in permutations],
                         saveLoc)
 
 
-def progressUpdate(a, k, l, r):
+def progressUpdate(a, k, l, r, j):
     if k % 100 == 0 and l == 0:
-        print("game " + str(r) + "-" + str(k) + " permuted")
+        print("game " + str(r) + "-" + str(r) + "-" + str(k) + " permuted")
     return a
 
 if __name__ == "__main__":
