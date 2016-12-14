@@ -66,7 +66,8 @@ class GameState:
                     position.place(toPlace * new.turnIndicator)
                 else:
                     if abs(moveSpecification.whatToPlace) != 1:
-                        raise TakException("You must place a flatstone on the first turn")
+                        print(self)
+                        raise TakException("You must place a flatstone on the first turn: " + moveSpecificationString)
                     position.place(toPlace * new.turnIndicator * -1)
                 if toPlace % 3 == 0 and new.turnIndicator == 1:
                     new.__whiteCapstonesAvailable -= 1
@@ -111,7 +112,8 @@ class GameState:
                     else:
                         raise TakException("invalid movement direction:", direction)
                     if not new.__inBounds(file, rank):
-                        raise TakException("Cannot drop tiles onto " + str(file) + "," + str(rank) + ", it is off the board " + moveSpecificationString)
+                        raise TakException("Cannot drop tiles onto " + str(file) + "," + str(rank) +
+                                           ", it is off the board " + moveSpecificationString)
                     new.board[file][rank].place(dropCounts.pop(0), movingStack)
                 new.previousMoves.append(moveSpecificationString)
         new.turnIndicator *= -1
@@ -155,7 +157,6 @@ class GameState:
                 if stack and stack.top() * self.turnIndicator > 0:
                     for toMove in range(1, min(self.__carryLimit+1, stack.height()+1)):
                         arrangements = compositions[toMove-1]
-                        flat = self.flatBoard.flatBoard
                         for arr in arrangements:
                             if len(arr) <= i:
                                 movementMoves.append(self.__moveStringGen(toMove, i, j, "<", arr))
@@ -187,28 +188,32 @@ class GameState:
     # returns evaluation of the quality of the board for white
     def score(self):
         # todo
-        self
         return 0
 
     # returns data about the board in the appropriate format to feed to the DANN
     def toNetworkInputs(self):
         # todo
-        self
-        return []
+        return self
 
     # returns a list of all permutations of the board
     # for increasing training data
     # (robustness to orientation)
     def generatePermutations(self):
-        permutations = self.__allRotations() + self.__flipHorizontal().__allRotations()
-        inverted = self.__invert()
-        permutations += inverted.__allRotations() + inverted.__flipHorizontal().__allRotations()
-        return permutations
+        return self.generateNormalPermutations() + self.generateInvertedPermutations()
+
+    # returns a list of all non-inverted permutations of the board
+    def generateNormalPermutations(self):
+        return self.__allRotations() + self.__flipHorizontal().__allRotations()
+
+    # returns a list of all inverted permutations of the board
+    def generateInvertedPermutations(self):
+        return self.__invert().__allRotations() + self.__invert().__flipHorizontal().__allRotations()
 
     def __allRotations(self):
-        rotatations = [self.__rotate()]
+        rotatations = [self]
         for i in range(3):
             rotatations.append(rotatations[-1].__rotate())
+        return rotatations
 
     def __rotate(self):
         new = copy.deepcopy(self)
@@ -227,12 +232,33 @@ class GameState:
 
     def __invert(self):
         new = copy.deepcopy(self)
-        new.board = [stack.invert() for file in new.board for stack in file]
+        new.board = [[stack.invert() for stack in file] for file in new.board]
         return new
 
     # returns a string representation of the board in Tak Positional System (TPS) notation
+    # https://www.reddit.com/r/Tak/wiki/tak_positional_system
     def toTPS(self):
-        return str(self.board)
+        rows = []
+        for row in range(self.boardSize-1, -1, -1):
+            emptyCounter = 0
+            rowList = []
+            for col in range(self.boardSize):
+                stack = self.board[col][row]
+                if not stack:    # if the stack is empty
+                    emptyCounter += 1
+                else:
+                    if emptyCounter == 1:
+                        rowList.append("x")
+                    elif emptyCounter > 1:
+                        rowList.append("x" + str(emptyCounter))
+                    emptyCounter = 0
+                    rowList.append(stack.toTPSString())
+            if emptyCounter == 1:
+                rowList.append("x")
+            elif emptyCounter > 1:
+                rowList.append("x" + str(emptyCounter))
+            rows.append(rowList)
+        return '/'.join([','.join(row) for row in rows])
 
     # returns a GameState from a TPS string
     @staticmethod
@@ -259,3 +285,6 @@ class GameState:
 
     def __str__(self):
         return self.toTPS()
+
+    def __repr__(self):
+        return str(self.board)

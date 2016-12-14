@@ -4,7 +4,7 @@ class MoveSpecification:
 
     pieceLetterToNumber = {"F": 1, "S": 2, "C": 3}
 
-    fileLetterToIndex = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7,}
+    fileLetterToIndex = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
     directionIndicators = ["+", "-", ">", "<"]
 
     def __init__(self, moveSpecificationString, isPTN=True):

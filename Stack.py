@@ -67,7 +67,7 @@ class Stack:
         if Stack.isStandingStone(self.top()):
             self.__pieces[-1] = int(self.top() / 2)
         else:
-            raise Exception("Tried to flatten a " + self.top)
+            raise Exception("Tried to flatten a " + self.top())
 
     def countStones(self):
         whiteCount = 0
@@ -81,9 +81,6 @@ class Stack:
 
         return whiteCount, blackCount
 
-    def __str__(self):
-        return str(self.__pieces)
-
     def __len__(self):
         return self.height()
 
@@ -91,7 +88,7 @@ class Stack:
     def __bool__(self):
         return bool(self.__pieces)
 
-    # reeturns an inverted version of the stack, swapping the players
+    # returns an inverted version of the stack, swapping the players
     def invert(self):
         new = copy(self)
         new.__pieces = [-1 * piece for piece in new.__pieces]
@@ -113,7 +110,11 @@ class Stack:
         return self.__pieces
 
     def __str__(self):
-        return str(self.__pieces)
+        return self.toTPSString()
 
     def __repr__(self):
         return str(self.__pieces)
+
+    def toTPSString(self):
+        conv = {-1: "2", 1: "1", -2: "2S", 2: "1S", -3: "2C", 3: "1C"}
+        return ''.join([conv[piece] for piece in self.__pieces])
