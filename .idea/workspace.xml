@@ -1,21 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6b90657c-c791-4934-8283-bf64a2689fa8" name="Default" comment="various changes">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/parsedGames0" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/parsedGames1" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/parsedGames2" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/parsedGames3" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/parsedGames4" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/parsedGames5" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/parsedGames6" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/parsedGames7" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/parsedGames8" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ParsedGameStates/testParsedGames" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/joseph.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/joseph.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="6b90657c-c791-4934-8283-bf64a2689fa8" name="Default" comment="various changes" />
     <ignored path="TakAI.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -253,7 +239,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="ParsedGameStates" />
+              <option name="myItemId" value="RawDatabase" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
