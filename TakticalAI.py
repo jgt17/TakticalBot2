@@ -30,4 +30,5 @@ def playTak():
             print(exception)
             continue
 
-playTak()
+if __name__ == "__main__":
+    playTak()
