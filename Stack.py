@@ -118,3 +118,12 @@ class Stack:
     def toTPSString(self):
         conv = {-1: "2", 1: "1", -2: "2S", 2: "1S", -3: "2C", 3: "1C"}
         return ''.join([conv[piece] for piece in self.__pieces])
+
+    def toNetworkInputs(self):
+        pieces = self.__pieces[-5:]
+        pieces = [0]*(6-len(pieces)) + pieces + [0, 0]
+        if self.isCapstone(self.top):
+            pieces[-3:] = [0, 0, int(self.top()/3)]
+        elif self.isStandingStone(self.top()):
+            pieces[-3:] = [0, int(self.top()/2), 0]
+        return [n % 256 for n in [0]*(5 - len(pieces)) + pieces]

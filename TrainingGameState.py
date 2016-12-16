@@ -12,6 +12,9 @@ class TrainingGameState:
                [TrainingGameState(permuted, -self.trainingScore)
                 for permuted in self.gameState.generateInvertedPermutations()]
 
+    def toNetworkInputs(self):
+        return self.gameState.toNetworkInputs(), self.trainingScore
+
     def __str__(self):
         return str(self.trainingScore) + ": " + str(self.gameState)
 

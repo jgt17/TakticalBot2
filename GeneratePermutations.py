@@ -8,7 +8,7 @@ import pickle
 parsedGamesFilename = "parsedGames"
 permutedGamesStatesFilename = "permutedGameStates"
 
-# again, some bad practice here, but I only need to work with the one data set, and it it much faster
+# again, some bad practice here, but I only need to work with the one data set, and it is much faster
 
 
 def generatePermutations(games, r):

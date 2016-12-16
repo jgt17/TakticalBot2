@@ -39,11 +39,10 @@ class GameState:
         self.__carryLimit = self.boardSize
 
         self.flatBoard = FlatBoard(self)
-        whiteCount, blackCount, whiteStandingCount, blackStandingCount, whiteCapstoneCount, blackCapstoneCount = \
-            self.flatBoard.getPieceCounts()
+        self.pieceCounts = self.flatBoard.getPieceCounts()
 
-        self.__whiteCapstonesAvailable = GameState.capstonesAvailable[boardSize] - whiteCapstoneCount
-        self.__blackCapstonesAvailable = GameState.capstonesAvailable[boardSize] - blackCapstoneCount
+        self.__whiteCapstonesAvailable = GameState.capstonesAvailable[boardSize] - self.pieceCounts[4]
+        self.__blackCapstonesAvailable = GameState.capstonesAvailable[boardSize] - self.pieceCounts[4]
 
     # applies a move, given a move specification string
     # enforces tak rules
@@ -192,8 +191,13 @@ class GameState:
 
     # returns data about the board in the appropriate format to feed to the DANN
     def toNetworkInputs(self):
-        # todo
-        return self
+        flatContents = []
+        # row by col by stack + counts
+        for i in range(self.boardSize):
+            for j in range(self.boardSize):
+                flatContents += self.board[j][i].toNetworkInputs()
+        flatContents += self.flatBoard.getPieceCounts()
+        return bytes(flatContents)
 
     # returns a list of all permutations of the board
     # for increasing training data
@@ -210,10 +214,10 @@ class GameState:
         return self.__invert().__allRotations() + self.__invert().__flipHorizontal().__allRotations()
 
     def __allRotations(self):
-        rotatations = [self]
+        rotations = [self]
         for i in range(3):
-            rotatations.append(rotatations[-1].__rotate())
-        return rotatations
+            rotations.append(rotations[-1].__rotate())
+        return rotations
 
     def __rotate(self):
         new = copy.deepcopy(self)
