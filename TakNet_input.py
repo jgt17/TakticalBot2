@@ -12,15 +12,17 @@ def _float_feature(value):
 def _bytes_feature(value):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
+inputsDirName = "NetworkReadyGameStateRepresentations"
+
 
 # converts the permutedGameStates to suitable tf input
-# relevant gamestate is 5x5x6 (board width by board height by carry limit+1) + 6 for stone counts
+# relevant gameState is 5x5x6 (board width by board height by carry limit+1) + 6 for stone counts
 # converts to 5*5*6+6=156 vector
 def convertToTFExamples():
     gameStateReader = GameStateReader()
     outFileCounter = 0
     while not gameStateReader.done:
-        filename = os.path.join("NetworkReadyGameStateRepresentations",
+        filename = os.path.join(inputsDirName,
                                 "gameStates_" + str(outFileCounter) + ".tfrecords")
         # noinspection PyStatementEffect
         open(filename, 'w').close()
@@ -84,4 +86,8 @@ class GameStateReader:
         return [state.toNetworkInputs() for state in self.readGameStates(numberOfStates)]
 
 if __name__ == "__main__":
-    convertToTFExamples()
+    if os.path.isfile(os.path.join(inputsDirName, "gameStates_0.tfrecords")):
+        print("It appears that the inputs have already been processed.\n"
+              "Please Delete the contents of /" + inputsDirName + " to continue.")
+    else:
+        convertToTFExamples()
