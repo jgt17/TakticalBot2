@@ -26,10 +26,11 @@ def convertToTFExamples():
         open(filename, 'w').close()
         writer = tf.python_io.TFRecordWriter(filename)
         print("Saving to: \"" + filename + "\"")
-        for board, score in gameStateReader.readAndConvertGameStates(50000):
+        for board, pieceCounts, score in gameStateReader.readAndConvertGameStates(50000):
             example = tf.train.Example(features=tf.train.Features(feature={
                 "score:": _float_feature(score),
-                'boardData': _bytes_feature(board)}))
+                "pieceCounts": _bytes_feature(pieceCounts),
+                "boardData": _bytes_feature(board)}))
             writer.write(example.SerializeToString())
         writer.close()
         outFileCounter += 1

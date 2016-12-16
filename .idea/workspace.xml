@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6b90657c-c791-4934-8283-bf64a2689fa8" name="Default" comment="various changes">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TakNet_eval.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TakNet_input.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/TakNet_train" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/joseph.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/joseph.xml" />
+    <list default="true" id="6b90657c-c791-4934-8283-bf64a2689fa8" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GameState.py" afterPath="$PROJECT_DIR$/GameState.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GeneratePermutations.py" afterPath="$PROJECT_DIR$/GeneratePermutations.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Stack.py" afterPath="$PROJECT_DIR$/Stack.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TakNet.py" afterPath="$PROJECT_DIR$/TakNet.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TakNet_input.py" afterPath="$PROJECT_DIR$/TakNet_input.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TrainingGameState.py" afterPath="$PROJECT_DIR$/TrainingGameState.py" />
     </list>
     <ignored path="TakAI.iws" />
@@ -34,8 +28,8 @@
       <file leaf-file-name="GameState.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GameState.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3474">
-              <caret line="199" column="8" selection-start-line="199" selection-start-column="8" selection-end-line="199" selection-end-column="8" />
+            <state relative-caret-position="361">
+              <caret line="198" column="8" selection-start-line="198" selection-start-column="8" selection-end-line="198" selection-end-column="8" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -56,8 +50,8 @@
       <file leaf-file-name="TakNet_input.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/TakNet_input.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="349">
-              <caret line="69" column="23" selection-start-line="69" selection-start-column="23" selection-end-line="69" selection-end-column="23" />
+            <state relative-caret-position="320">
+              <caret line="30" column="40" selection-start-line="30" selection-start-column="40" selection-end-line="30" selection-end-column="40" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -120,8 +114,8 @@
       <file leaf-file-name="TrainingGameState.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TrainingGameState.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="234">
-              <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+            <state relative-caret-position="270">
+              <caret line="16" column="33" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
               <folding />
             </state>
           </provider>
@@ -167,8 +161,8 @@
         <option value="$PROJECT_DIR$/TakNet/TakNet.py" />
         <option value="$PROJECT_DIR$/GeneratePermutations.py" />
         <option value="$PROJECT_DIR$/TakNet/TakNet_input.py" />
-        <option value="$PROJECT_DIR$/TrainingGameState.py" />
         <option value="$PROJECT_DIR$/Stack.py" />
+        <option value="$PROJECT_DIR$/TrainingGameState.py" />
         <option value="$PROJECT_DIR$/GameState.py" />
         <option value="$PROJECT_DIR$/TakNet_input.py" />
       </list>
@@ -527,7 +521,14 @@
       <option name="project" value="LOCAL" />
       <updated>1481531530441</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="implemented conversion to tf inputs">
+      <created>1481847468370</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1481847468370</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -615,7 +616,8 @@
     <MESSAGE value="implemented applyMove, generateMoves, generatePermutations" />
     <MESSAGE value="framework nearly done&#10;completed minimax and the interface, ai plays now, but stupidly&#10;need to fix victory check and implement dnn" />
     <MESSAGE value="various changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="various changes" />
+    <MESSAGE value="implemented conversion to tf inputs" />
+    <option name="LAST_COMMIT_MESSAGE" value="implemented conversion to tf inputs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -903,26 +905,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GameState.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3474">
-          <caret line="199" column="8" selection-start-line="199" selection-start-column="8" selection-end-line="199" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TakNet_input.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="69" column="23" selection-start-line="69" selection-start-column="23" selection-end-line="69" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda3/lib/python3.5/site-packages/google/protobuf/internal/containers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4896">
@@ -965,19 +947,39 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/TrainingGameState.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="234">
-          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GeneratePermutations.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="10" column="90" selection-start-line="10" selection-start-column="90" selection-end-line="10" selection-end-column="90" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TrainingGameState.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="16" column="33" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GameState.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="198" column="8" selection-start-line="198" selection-start-column="8" selection-end-line="198" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TakNet_input.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="30" column="40" selection-start-line="30" selection-start-column="40" selection-end-line="30" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

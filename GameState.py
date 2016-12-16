@@ -196,8 +196,7 @@ class GameState:
         for i in range(self.boardSize):
             for j in range(self.boardSize):
                 flatContents += self.board[j][i].toNetworkInputs()
-        flatContents += self.flatBoard.getPieceCounts()
-        return bytes(flatContents)
+        return bytes(flatContents), bytes(self.flatBoard.getPieceCounts())
 
     # returns a list of all permutations of the board
     # for increasing training data
