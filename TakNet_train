@@ -1,0 +1,69 @@
+import TakNet
+
+from datetime import datetime
+import time
+import tensorflow as tf
+
+FLAGS = tf.app.flags.FLAGS
+
+tf.app.flags.DEFINE_string('train_dir', '/tmp/tak_train', """Directory where to write event logs and checkpoint.""")
+tf.app.flags.DEFINE_integer('max_steps', 894, """Number of batches to run.""")
+
+
+# train TakNet for a number of steps
+def train():
+    with tf.Graph().as_default():
+        globalStep = tf.contrib.framework.get_or_create_global_step()
+
+        # get data
+        boards, pieceCounts, realScores = TakNet.inputs(False)
+
+        # instantiate prediction graph
+        scores = TakNet.inference(boards, pieceCounts)
+
+        # calculate loss
+        loss = TakNet.loss(realScores, scores)
+
+        # train for one batch and update parameters
+        trainOp = TakNet.train(loss, globalStep)
+
+        # class to log loss over time
+        # noinspection PyAttributeOutsideInit
+        # noinspection PyUnusedLocal
+        class LoggerHook(tf.train.SessionRunHook):
+
+            def begin(self):
+                self._step = -1
+
+            def before_run(self, runContext):
+                self._step += 1
+                self._startTime = time.time()
+                return tf.train.SessionRunArgs(loss)
+
+            def after_run(self, runContext, runValues):
+                duration = time.time() - self._startTime
+                lossValue = runValues.results
+                if self._step % 10 == 0:
+                    examplesPerStep = FLAGS.batch_size
+                    examplesPerSecond = examplesPerStep/duration
+                    secondsPerBatch = float(duration)
+
+                    formatString = '%s: step %d, loss = %.2f (%.1f examples/sec; %.3f sec/batch)'
+                    print(formatString % (datetime.now(), self._step, lossValue, examplesPerSecond, secondsPerBatch))
+
+        with tf.train.MonitoredTrainingSession(
+                checkpoint_dir=FLAGS.train_dir,
+                hooks=[tf.train.StopAtStepHook(last_step=FLAGS.max_steps),
+                       tf.train.NanTensorHook(loss),
+                       LoggerHook()],
+                config=tf.ConfigProto()) as monitoredSession:
+            while not monitoredSession.should_stop():
+                monitoredSession.run(trainOp)
+
+
+# noinspection PyUnusedLocal
+def main(argv=None):
+    train()
+
+if __name__ == "__main__":
+    tf.app.run()

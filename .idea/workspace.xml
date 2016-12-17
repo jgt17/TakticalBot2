@@ -3,9 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="6b90657c-c791-4934-8283-bf64a2689fa8" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/joseph.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/joseph.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GameState.py" afterPath="$PROJECT_DIR$/GameState.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TakNet.py" afterPath="$PROJECT_DIR$/TakNet.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TakNet_input.py" afterPath="$PROJECT_DIR$/TakNet_input.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TakNet_train" afterPath="$PROJECT_DIR$/TakNet_train" />
     </list>
     <ignored path="TakAI.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -28,30 +31,30 @@
       <file leaf-file-name="GameState.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GameState.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3431">
-              <caret line="198" column="8" selection-start-line="198" selection-start-column="8" selection-end-line="198" selection-end-column="8" />
-              <folding>
-                <element signature="e#0#23#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TakNet.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/TakNet.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="80" column="23" selection-start-line="80" selection-start-column="23" selection-end-line="80" selection-end-column="23" />
+            <state relative-caret-position="90">
+              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TakNet_input.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="TakNet.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TakNet.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="792">
+              <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#19#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TakNet_input.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/TakNet_input.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1512">
-              <caret line="88" column="50" selection-start-line="88" selection-start-column="50" selection-end-line="88" selection-end-column="50" />
+            <state relative-caret-position="-556">
+              <caret line="112" column="0" selection-start-line="112" selection-start-column="0" selection-end-line="112" selection-end-column="0" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -64,7 +67,9 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="4896">
               <caret line="273" column="0" selection-start-line="273" selection-start-column="0" selection-end-line="273" selection-end-column="0" />
-              <folding />
+              <folding>
+                <marker date="1481948266708" expanded="true" signature="4034:4136" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -72,9 +77,11 @@
       <file leaf-file-name="TakNet_train" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TakNet_train">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="160">
+              <caret line="18" column="61" selection-start-line="18" selection-start-column="61" selection-end-line="18" selection-end-column="61" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -82,7 +89,7 @@
       <file leaf-file-name="FlatBoard.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/FlatBoard.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="748">
+            <state relative-caret-position="1548">
               <caret line="86" column="11" selection-start-line="86" selection-start-column="11" selection-end-line="86" selection-end-column="11" />
               <folding />
             </state>
@@ -163,16 +170,17 @@
         <option value="$PROJECT_DIR$/Stack.py" />
         <option value="$PROJECT_DIR$/TrainingGameState.py" />
         <option value="$PROJECT_DIR$/GameState.py" />
-        <option value="$PROJECT_DIR$/TakNet_input.py" />
         <option value="$PROJECT_DIR$/TakNet.py" />
+        <option value="$PROJECT_DIR$/TakNet_train" />
+        <option value="$PROJECT_DIR$/TakNet_input.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="462" />
-    <option name="y" value="168" />
-    <option name="width" value="1255" />
-    <option name="height" value="912" />
+    <option name="x" value="203" />
+    <option name="y" value="162" />
+    <option name="width" value="1312" />
+    <option name="height" value="900" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -218,6 +226,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -238,7 +247,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -535,7 +543,14 @@
       <option name="project" value="LOCAL" />
       <updated>1481854327713</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="mostly implemented network&#10;(not training or getting inputs)">
+      <created>1481924530237</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1481924530237</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -548,14 +563,14 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="462" y="168" width="1255" height="912" extended-state="0" />
+    <frame x="203" y="162" width="1312" height="900" extended-state="0" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18425325" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17610551" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32925338" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32555282" sideWeight="0.50251615" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33783785" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36240786" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34289277" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36159602" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32965687" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -625,7 +640,8 @@
     <MESSAGE value="various changes" />
     <MESSAGE value="implemented conversion to tf inputs" />
     <MESSAGE value="adjusted tf representation&#10;flat(5x5x6) array for board, 6 for piece counts, float for score" />
-    <option name="LAST_COMMIT_MESSAGE" value="adjusted tf representation&#10;flat(5x5x6) array for board, 6 for piece counts, float for score" />
+    <MESSAGE value="mostly implemented network&#10;(not training or getting inputs)" />
+    <option name="LAST_COMMIT_MESSAGE" value="mostly implemented network&#10;(not training or getting inputs)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -638,9 +654,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
           <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -687,7 +701,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
           <caret line="1" column="26" selection-start-line="1" selection-start-column="26" selection-end-line="1" selection-end-column="26" />
-          <folding />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -710,9 +726,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1818">
           <caret line="101" column="71" selection-start-line="101" selection-start-column="71" selection-end-line="101" selection-end-column="71" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -759,7 +773,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
           <caret line="1" column="26" selection-start-line="1" selection-start-column="26" selection-end-line="1" selection-end-column="26" />
-          <folding />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -776,9 +792,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -807,7 +821,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="18">
           <caret line="1" column="26" selection-start-line="1" selection-start-column="26" selection-end-line="1" selection-end-column="26" />
-          <folding />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -834,9 +850,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -909,15 +923,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4896">
           <caret line="273" column="0" selection-start-line="273" selection-start-column="0" selection-end-line="273" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TakNet_train">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <marker date="1481948266708" expanded="true" signature="4034:4136" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -955,39 +963,49 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/TakNet_input.py">
+    <entry file="file://$PROJECT_DIR$/FlatBoard.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1512">
-          <caret line="88" column="50" selection-start-line="88" selection-start-column="50" selection-end-line="88" selection-end-column="50" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="1548">
+          <caret line="86" column="11" selection-start-line="86" selection-start-column="11" selection-end-line="86" selection-end-column="11" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GameState.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3431">
-          <caret line="198" column="8" selection-start-line="198" selection-start-column="8" selection-end-line="198" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/FlatBoard.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="748">
-          <caret line="86" column="11" selection-start-line="86" selection-start-column="11" selection-end-line="86" selection-end-column="11" />
+        <state relative-caret-position="90">
+          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/TakNet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="80" column="23" selection-start-line="80" selection-start-column="23" selection-end-line="80" selection-end-column="23" />
-          <folding />
+        <state relative-caret-position="792">
+          <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="47" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TakNet_train">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="18" column="61" selection-start-line="18" selection-start-column="61" selection-end-line="18" selection-end-column="61" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TakNet_input.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-556">
+          <caret line="112" column="0" selection-start-line="112" selection-start-column="0" selection-end-line="112" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -3,6 +3,7 @@ from MoveSpecification import MoveSpecification
 from FlatBoard import FlatBoard
 from Misc import compositions
 from TakException import TakException
+
 import string
 import copy
 
