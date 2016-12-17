@@ -17,9 +17,9 @@ import os
 FLAGS = tf.app.flags.FLAGS
 
 # Basic model parameters.
-tf.app.flags.DEFINE_integer('batch_size', 128,
+tf.app.flags.DEFINE_integer('batchSize', 128,
                             """Number of games processed in a batch""")
-tf.app.flags.DEFINE_string('data_dir', '/NetworkReadyGameStateRepresentations',
+tf.app.flags.DEFINE_string('dataDir', 'NetworkReadyGameStateRepresentations',
                            """Path to the gameState data directory.""")
 
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = TakNet_input.NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
@@ -33,8 +33,8 @@ INITIAL_LEARNING_RATE = 0.1       # Initial learning rate.
 
 # saves activation summaries for later review
 def generateActivationSummary(tensor):
-    tf.Summary.histogram(tensor.op.name + "/activations", tensor)
-    tf.Summary.scalar(tensor.op.name + "sparsity", tf.nn.zero_fraction(tensor))
+    tf.summary.histogram(tensor.op.name + "/activations", tensor)
+    tf.summary.scalar(tensor.op.name + "sparsity", tf.nn.zero_fraction(tensor))
 
 
 # helper to create vars with weight decay
@@ -49,11 +49,10 @@ def getVarWithWeightDecay(name, shape, stddev=1.0, weightDecayScale=None):
 
 # helper to load inputs
 # noinspection PyUnusedLocal
-def inputs(setNum, evalData):
-    dataDir = os.path.join(FLAGS.data_dir, 'gameStates_' + setNum)
-    board, pieceCounts, realScore = TakNet_input.inputs(eval_data=evalData,
-                                                        data_dir=dataDir,
-                                                        batch_size=FLAGS.batch_size)
+def inputs(evalData):
+    board, pieceCounts, realScore = TakNet_input.inputs(evalData=evalData,
+                                                        dataDir=FLAGS.dataDir,
+                                                        batchSize=FLAGS.batchSize)
     return board, pieceCounts, realScore
 
 # create the graph
@@ -80,8 +79,8 @@ def inference(boards, pieceCounts):
     # board convolution
     with tf.variable_scope("boardConv") as scope:
         kernel = getVarWithWeightDecay("weights", [3, 3, 1, 20], 5e-2, 0)
-        conv = tf.nn.conv2d(boards, kernel, [1, 1, 1, 1], "VALID")
-        biases = tf.get_variable("biases", [1], tf.float32, tf.truncated_normal_initializer())
+        conv = tf.nn.conv2d(flattenConv, kernel, [1, 1, 1, 1], "VALID")
+        biases = tf.get_variable("biases", [20], tf.float32, tf.truncated_normal_initializer())
         boardConv = tf.nn.tanh(tf.nn.bias_add(conv, biases), name=scope.name)
         generateActivationSummary(boardConv)
 
@@ -92,7 +91,7 @@ def inference(boards, pieceCounts):
                                        tf.constant([21, 21, 21, 21, 1, 1], tf.float32),
                                        "normalizedPieceCounts")
         # move each example to 1D (-1 -> infer size)
-        reshaped = tf.reshape(FLAGS.batchSize, -1)
+        reshaped = tf.reshape(boardConv, [FLAGS.batchSize, -1])
         injectPieceCounts = tf.concat(1, [reshaped, normalizedPieceCounts], "injectPieceCounts")
 
         dim = injectPieceCounts.get_shape()[1].value
@@ -108,9 +107,9 @@ def inference(boards, pieceCounts):
         generateActivationSummary(fullyConnected2)
 
     with tf.variable_scope("score"):
-        weights = getVarWithWeightDecay("weights", [25], 0.04, 0.01)
+        weights = getVarWithWeightDecay("weights", [25, 1], 0.04, 0.01)
         bias = tf.get_variable("bias", [1], tf.float32, tf.truncated_normal_initializer(stddev=0.04))
-        score = tf.tanh(tf.mul(fullyConnected2, weights) + bias, name=scope.name)
+        score = tf.tanh(tf.matmul(fullyConnected2, weights) + bias, name=scope.name)
         generateActivationSummary(score)
 
     return score
@@ -123,18 +122,18 @@ def loss(realScores, networkScores):
     tf.add_to_collection("losses", meanScoreLoss)
 
     # total loss includes loss from decaying variables
-    return tf.add_n(tf.get_collection("losses"), "Total Loss")
+    return tf.add_n(tf.get_collection("losses"), name="TotalLoss")
 
 
 # include summaries of losses in output
 def addLossSummaries(totalLoss):
-    lossAverages = tf.train.ExponentialMovingAverage(.9, "Avg")
+    lossAverages = tf.train.ExponentialMovingAverage(.9, name="Avg")
     losses = tf.get_collection("losses")
     lossAveragesOp = lossAverages.apply(losses + [totalLoss])
 
     for l in losses + [totalLoss]:
-        tf.Summary.scalar(l.op.name + "raw", l)
-        tf.Summary.scalar(l.op.name, lossAverages.average(l))
+        tf.summary.scalar(l.op.name + "raw", l)
+        tf.summary.scalar(l.op.name, lossAverages.average(l))
 
     return lossAveragesOp
 
@@ -142,7 +141,7 @@ def addLossSummaries(totalLoss):
 # training step
 def train(totalLoss, globalStep):
     # Variables that affect learning rate.
-    numBatchesPerEpoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN / FLAGS.batch_size
+    numBatchesPerEpoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN / FLAGS.batchSize
     decaySteps = int(numBatchesPerEpoch * NUM_EPOCHS_PER_DECAY)
 
     # Decay the learning rate exponentially based on the number of steps.
@@ -151,7 +150,7 @@ def train(totalLoss, globalStep):
                                     decaySteps,
                                     LEARNING_RATE_DECAY_FACTOR,
                                     staircase=True)
-    tf.Summary.scalar('learning_rate', lr)
+    tf.summary.scalar('learning_rate', lr)
 
     # average losses
     lossAveragesOp = addLossSummaries(totalLoss)
@@ -166,12 +165,12 @@ def train(totalLoss, globalStep):
 
     # add histograms for the weights and biases
     for variable in tf.trainable_variables():
-        tf.Summary.histogram(variable.op.name, variable)
+        tf.summary.histogram(variable.op.name, variable)
 
     # add histograms for the gradients
     for gradient, variable in gradients:
         if gradient is not None:
-            tf.Summary.histogram(variable.op.name + "/gradients", gradient)
+            tf.summary.histogram(variable.op.name + "/gradients", gradient)
 
     # track moving averages of weights and biases
     variableAverages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY, globalStep)

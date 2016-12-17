@@ -6,8 +6,8 @@ import tensorflow as tf
 
 FLAGS = tf.app.flags.FLAGS
 
-tf.app.flags.DEFINE_string('train_dir', '/tmp/tak_train', """Directory where to write event logs and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 894, """Number of batches to run.""")
+tf.app.flags.DEFINE_string('trainDir', '/tmp/tak_train', """Directory where to write event logs and checkpoint.""")
+tf.app.flags.DEFINE_integer('maxSteps', 894, """Number of batches to run.""")
 
 
 # train TakNet for a number of steps
@@ -30,6 +30,7 @@ def train():
         # class to log loss over time
         # noinspection PyAttributeOutsideInit
         # noinspection PyUnusedLocal
+        # noinspection PyClassHasNoInit
         class LoggerHook(tf.train.SessionRunHook):
 
             def begin(self):
@@ -44,7 +45,7 @@ def train():
                 duration = time.time() - self._startTime
                 lossValue = runValues.results
                 if self._step % 10 == 0:
-                    examplesPerStep = FLAGS.batch_size
+                    examplesPerStep = FLAGS.batchSize
                     examplesPerSecond = examplesPerStep/duration
                     secondsPerBatch = float(duration)
 
@@ -52,8 +53,8 @@ def train():
                     print(formatString % (datetime.now(), self._step, lossValue, examplesPerSecond, secondsPerBatch))
 
         with tf.train.MonitoredTrainingSession(
-                checkpoint_dir=FLAGS.train_dir,
-                hooks=[tf.train.StopAtStepHook(last_step=FLAGS.max_steps),
+                checkpoint_dir=FLAGS.trainDir,
+                hooks=[tf.train.StopAtStepHook(last_step=FLAGS.maxSteps),
                        tf.train.NanTensorHook(loss),
                        LoggerHook()],
                 config=tf.ConfigProto()) as monitoredSession:
@@ -66,4 +67,7 @@ def main(argv=None):
     train()
 
 if __name__ == "__main__":
+    if tf.gfile.Exists(FLAGS.trainDir):
+        tf.gfile.DeleteRecursively(FLAGS.trainDir)
+    tf.gfile.MakeDirs(FLAGS.trainDir)
     tf.app.run()

@@ -113,52 +113,40 @@ def generateBatch(board, pieceCounts, realScore, minQueueExamples, batchSize, sh
 
 # read in gameStates from the file queue
 def readGameStates(fileNameQueue):
-    reader = tf.TFRecordReader("Example Reader")
+    reader = tf.TFRecordReader("ExampleReader")
     key, value = reader.read(fileNameQueue)
+    #val = tf.Print(value, [value])
+    example = tf.parse_single_example(value, features={"score:": tf.FixedLenFeature([], tf.float32),
+                                                       "pieceCounts": tf.FixedLenFeature([], tf.string),
+                                                       "boardData": tf.FixedLenFeature([], tf.string)}, name="whataboutthisone")
+    #printExample = tf.Print(example, [example])
+    score = tf.reshape(example["score:"], [1], "isitthisone")
+    pieceCounts = tf.reshape(tf.cast(tf.decode_raw(example["pieceCounts"], tf.uint8), tf.float32), [6])
+    board = tf.reshape(tf.cast(tf.decode_raw(example["boardData"], tf.int8), tf.float32), [5, 5, 8])
 
-    class ScoreFeature(tf.FixedLenFeature):
-        shape = [1]
-        dtype = tf.float32
+    # def correct(x):
+    #   tf.cond(tf.equal(x, tf.constant(255, tf.float32)), lambda: tf.constant(-1, tf.float32), lambda: x)
 
-    class PieceCountsFeature(tf.FixedLenFeature):
-        shape = [6]
-        dtype = tf.uint8
+    # correctedBoard = tf.reshape(tf.map_fn(correct, board), [5, 5, 8])
 
-    class BoardFeature(tf.FixedLenFeature):
-        shape = [5, 5, 8]
-        dtype = tf.uint8
-
-    example = tf.parse_single_example(value, features=tf.train.Features(feature={
-                                                    "score:": ScoreFeature,
-                                                    "pieceCounts": PieceCountsFeature,
-                                                    "boardData": BoardFeature}))
-
-    score = example.score
-    pieceCounts = tf.cast(example.peiceCounts, tf.float32)
-    board = tf.cast(tf.reshape(example.boardData, [-1]), tf.float32)
-
-    def correct(x):
-        tf.cond(tf.equal(x, tf.constant(255, tf.float32)), lambda: tf.constant(-1, tf.float32), lambda: tf.identity(x))
-
-    correctedBoard = tf.reshape(tf.map(correct, board), [5, 5, 8])
-
-    return correctedBoard, pieceCounts, score
+    return board, pieceCounts, score
 
 
 # load inputs
-def inputs(evalData, dataDir, batchSize, epoch):
+def inputs(evalData, dataDir, batchSize):
     # get different data for evaluation and training (every 10th example file is set aside for evaluations)
     if evalData:
-        fileNames = [os.path.join(dataDir, "gameStates_%i" % i) for i in range(0, 894) if i % 10 == 0]
+        fileNames = [dataDir + "/gameStates_%i.tfrecords" % i for i in range(894) if i % 10 == 0]
         numExamplesPerEpoch = NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
     else:
-        fileNames = [os.path.join(dataDir, "gameStates_%i" % i) for i in range(0, 894) if i % 10 != 0]
+        fileNames = [dataDir + "/gameStates_%i.tfrecords" % i for i in range(894) if i % 10 != 0]
         numExamplesPerEpoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
 
     # ensure each file exists
     for f in fileNames:
         if not tf.gfile.Exists(f):
-            raise ValueError("Could not find \"" + f + "\"")
+            string = "Could not find \"" + f + "\""
+            raise ValueError(string)
 
     fileNameQueue = tf.train.string_input_producer(fileNames)
     board, pieceCounts, realScore = readGameStates(fileNameQueue)
