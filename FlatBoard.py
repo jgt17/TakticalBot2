@@ -19,7 +19,7 @@ class FlatBoard:
     # fixme
     def checkVictory(self):
         r = self.__checkRoadVictory()
-        if r != 0:
+        if r != 0:      # road victory takes priority over flats victory
             return r
         elif self.blackPiecesLeft == 0 or self.whitePiecesLeft == 0 or self.__boardIsCovered():
             return self.__checkFlatVictory()
@@ -31,8 +31,8 @@ class FlatBoard:
         leftEdge = set()
         bottomEdge = set()
         for i in range(boardSize):
-            leftEdge.add((0, i))
-            bottomEdge.add((i, 0))
+            leftEdge.add((-1, i))
+            bottomEdge.add((i, -1))
         if self.__roadExists(leftEdge, boardSize, "horizontal", 1)\
                 or self.__roadExists(bottomEdge, boardSize, "vertical", 1):
             return 1
@@ -85,12 +85,12 @@ class FlatBoard:
         return True
 
     # fixme
-    def __roadExists(self, openset, size, direction, player):
+    def __roadExists(self, openSet, size, direction, player):
         closedSet = set()
-        openSet = openset.copy()
+        openSet = openSet.copy()
         while openSet:
             curr = openSet.pop()
-            if (direction == "horizontal" and curr[0] == size) or (direction == "vertical" and curr[1] == size):
+            if (direction == "horizontal" and curr[0] == size - 1) or (direction == "vertical" and curr[1] == size - 1):
                 return True
             closedSet.add(curr)
             adj = self.__getAdj(curr)

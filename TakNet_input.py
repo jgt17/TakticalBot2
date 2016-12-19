@@ -13,7 +13,7 @@ def _bytes_feature(value):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
 inputsDirName = "NetworkReadyGameStateRepresentations"
-NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 40000
+NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
 
 
@@ -118,9 +118,9 @@ def readGameStates(fileNameQueue):
     #val = tf.Print(value, [value])
     example = tf.parse_single_example(value, features={"score:": tf.FixedLenFeature([], tf.float32),
                                                        "pieceCounts": tf.FixedLenFeature([], tf.string),
-                                                       "boardData": tf.FixedLenFeature([], tf.string)}, name="whataboutthisone")
+                                                       "boardData": tf.FixedLenFeature([], tf.string)})
     #printExample = tf.Print(example, [example])
-    score = tf.reshape(example["score:"], [1], "isitthisone")
+    score = tf.reshape(example["score:"], [1])
     pieceCounts = tf.reshape(tf.cast(tf.decode_raw(example["pieceCounts"], tf.uint8), tf.float32), [6])
     board = tf.reshape(tf.cast(tf.decode_raw(example["boardData"], tf.int8), tf.float32), [5, 5, 8])
 

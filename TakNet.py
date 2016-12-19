@@ -3,21 +3,21 @@ import TakNet_input
 import tensorflow as tf
 import os
 
-#the nueral network for TakticalAI
+# the nueral network for TakticalAI
 # input format: 5x5x8 (stack x column x row) and 6 (piece counts)
 #       convolutions on stacks (conv w/ 1x1x8x20 filter)
 #       |         reduction to 5x5 (conv w/ 1x1x20x1 filter)
-#       |         |        convolutions on board (conv w/ 3x3x1x20 filter)
-#       |         |        |         fully connected layers
-#       |         |        |         |     |     |
-# 5x5x8 -> 5x5x20 -> 5x5x1 -> 3x3x20 -> 50 -> 25 -> 1
+#       |         |         convolutions on board (conv w/ 3x3x1x20 filter)
+#       |         |         |         fully connected layers
+#       |         |         |         |     |     |
+# 5x5x8 -> 5x5x50 -> 5x5x25 -> 3x3x50 -> 100 -> 50 -> 1
 #                                 6 ---^
 #                inject piece counts ^
 
 FLAGS = tf.app.flags.FLAGS
 
 # Basic model parameters.
-tf.app.flags.DEFINE_integer('batchSize', 128,
+tf.app.flags.DEFINE_integer('batchSize', 1000,
                             """Number of games processed in a batch""")
 tf.app.flags.DEFINE_string('dataDir', 'NetworkReadyGameStateRepresentations',
                            """Path to the gameState data directory.""")
@@ -25,10 +25,10 @@ tf.app.flags.DEFINE_string('dataDir', 'NetworkReadyGameStateRepresentations',
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = TakNet_input.NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = TakNet_input.NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
 
-MOVING_AVERAGE_DECAY = 0.99999    # The decay to use for the moving average.
-NUM_EPOCHS_PER_DECAY = 200.0      # Epochs after which learning rate decays.
-LEARNING_RATE_DECAY_FACTOR = 0.1  # Learning rate decay factor.
-INITIAL_LEARNING_RATE = 0.1       # Initial learning rate.
+MOVING_AVERAGE_DECAY = 0.9999       # The decay to use for the moving average.
+NUM_EPOCHS_PER_DECAY = 1.0          # Epochs after which learning rate decays.
+LEARNING_RATE_DECAY_FACTOR = .999   # Learning rate decay factor.
+INITIAL_LEARNING_RATE = .00001      # Initial learning rate.
 
 
 # saves activation summaries for later review
@@ -55,6 +55,7 @@ def inputs(evalData):
                                                         batchSize=FLAGS.batchSize)
     return board, pieceCounts, realScore
 
+
 # create the graph
 # using tanh as activation function (gameState can be good for the other player (bad, negative),
 #                                                     neutral (0ish), or
@@ -62,67 +63,74 @@ def inputs(evalData):
 def inference(boards, pieceCounts):
     # convolution on stacks
     with tf.variable_scope("stackConv") as scope:
-        kernel = getVarWithWeightDecay("weights", [1, 1, 8, 20], 5e-2, 0)
+        kernel = getVarWithWeightDecay("weights", [1, 1, 8, 50], 5e-2, .1)
+        #kernel2 = tf.Print(kernel, [kernel], "K1")
         conv = tf.nn.conv2d(boards, kernel, [1, 1, 1, 1], "VALID")
-        biases = tf.get_variable("biases", [20], tf.float32, tf.truncated_normal_initializer())
+        biases = tf.get_variable("biases", [50], tf.float32, tf.truncated_normal_initializer())
         stackConv = tf.nn.tanh(tf.nn.bias_add(conv, biases), name=scope.name)
         generateActivationSummary(stackConv)
 
-    # to flat board
+    # 2nd conv on stacks
     with tf.variable_scope("flattenConv") as scope:
-        kernel = getVarWithWeightDecay("weights", [1, 1, 20, 1], 5e-2, 0)
+        kernel = getVarWithWeightDecay("weights", [1, 1, 50, 25], 5e-2, .1)
+        #kernel2 = tf.Print(kernel, [kernel], "K2")
         conv = tf.nn.conv2d(stackConv, kernel, [1, 1, 1, 1], "VALID")
-        biases = tf.get_variable("biases", [1], tf.float32, tf.truncated_normal_initializer())
+        biases = tf.get_variable("biases", [25], tf.float32, tf.truncated_normal_initializer())
         flattenConv = tf.nn.tanh(tf.nn.bias_add(conv, biases), name=scope.name)
         generateActivationSummary(flattenConv)
 
     # board convolution
     with tf.variable_scope("boardConv") as scope:
-        kernel = getVarWithWeightDecay("weights", [3, 3, 1, 20], 5e-2, 0)
+        kernel = getVarWithWeightDecay("weights", [3, 3, 25, 50], 5e-2, .1)
+        #kernel2 = tf.Print(kernel, [kernel], "K2")
         conv = tf.nn.conv2d(flattenConv, kernel, [1, 1, 1, 1], "VALID")
-        biases = tf.get_variable("biases", [20], tf.float32, tf.truncated_normal_initializer())
+        biases = tf.get_variable("biases", [50], tf.float32, tf.truncated_normal_initializer())
         boardConv = tf.nn.tanh(tf.nn.bias_add(conv, biases), name=scope.name)
         generateActivationSummary(boardConv)
 
-    # fully connected layers
-    with tf.variable_scope("fullyConnected1") as scope:
+    with tf.variable_scope("flatten"):
         # normalize piece counts
         normalizedPieceCounts = tf.div(pieceCounts,
                                        tf.constant([21, 21, 21, 21, 1, 1], tf.float32),
                                        "normalizedPieceCounts")
         # move each example to 1D (-1 -> infer size)
-        reshaped = tf.reshape(boardConv, [FLAGS.batchSize, -1])
-        injectPieceCounts = tf.concat(1, [reshaped, normalizedPieceCounts], "injectPieceCounts")
+        reshaped = tf.reshape(boardConv, [-1, 450])     # 3*3*50
+        flatBoard = tf.concat(1, [reshaped, normalizedPieceCounts], "injectPieceCounts")
 
-        dim = injectPieceCounts.get_shape()[1].value
-        weights = getVarWithWeightDecay("weights", [dim, 50], 0.04, 0.01)
-        biases = tf.get_variable("biases", [50], tf.float32, tf.truncated_normal_initializer(stddev=0.04))
-        fullyConnected1 = tf.tanh(tf.matmul(injectPieceCounts, weights) + biases, name=scope.name)
+    # fully connected layers
+    with tf.variable_scope("fullyConnected1") as scope:
+        weights = getVarWithWeightDecay("weights", [456, 100], 0.04, .1)
+        biases = tf.get_variable("biases", [1], tf.float32, tf.truncated_normal_initializer(stddev=0.04))
+        fullyConnected1 = tf.tanh(tf.matmul(flatBoard, weights) + biases, name=scope.name)
         generateActivationSummary(fullyConnected1)
 
     with tf.variable_scope("fullyConnected2") as scope:
-        weights = getVarWithWeightDecay("weights", [50, 25], 0.04, 0.01)
-        biases = tf.get_variable("biases", [25], tf.float32, tf.truncated_normal_initializer(stddev=0.04))
+        weights = getVarWithWeightDecay("weights", [100, 50], 0.04, .1)
+        biases = tf.get_variable("biases", [50], tf.float32, tf.truncated_normal_initializer(stddev=0.04))
         fullyConnected2 = tf.tanh(tf.matmul(fullyConnected1, weights) + biases, name=scope.name)
         generateActivationSummary(fullyConnected2)
 
     with tf.variable_scope("score"):
-        weights = getVarWithWeightDecay("weights", [25, 1], 0.04, 0.01)
+        weights = getVarWithWeightDecay("weights", [50, 1], 0.04, .1)
         bias = tf.get_variable("bias", [1], tf.float32, tf.truncated_normal_initializer(stddev=0.04))
         score = tf.tanh(tf.matmul(fullyConnected2, weights) + bias, name=scope.name)
         generateActivationSummary(score)
+    score = score
 
-    return score
+    return tf.reshape(score, [-1])
 
 
 # calculates L2 loss on scores and network output
 def loss(realScores, networkScores):
-    scoresLoss = tf.nn.l2_loss(realScores-networkScores)
-    meanScoreLoss = tf.reduce_mean(scoresLoss)
-    tf.add_to_collection("losses", meanScoreLoss)
+    # scoresLoss = tf.reduce_sum(tf.abs(realScores-networkScores), name="loss")  # l1 loss
+    scoresLoss = tf.nn.l2_loss(realScores-networkScores)                        # l2loss
+    # scoresLoss2 = tf.Print(scoresLoss, [realScores, networkScores])
+    tf.add_to_collection("losses", scoresLoss)
 
     # total loss includes loss from decaying variables
-    return tf.add_n(tf.get_collection("losses"), name="TotalLoss")
+    return tf.add_n(tf.get_collection("losses"), name="TotalLoss"), scoresLoss
+
+    # return meanScoreLoss
 
 
 # include summaries of losses in output
@@ -139,7 +147,7 @@ def addLossSummaries(totalLoss):
 
 
 # training step
-def train(totalLoss, globalStep):
+def train(totalLoss, meanLoss, globalStep):
     # Variables that affect learning rate.
     numBatchesPerEpoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN / FLAGS.batchSize
     decaySteps = int(numBatchesPerEpoch * NUM_EPOCHS_PER_DECAY)
@@ -155,13 +163,13 @@ def train(totalLoss, globalStep):
     # average losses
     lossAveragesOp = addLossSummaries(totalLoss)
 
-    # compute gradients
+    # compute and apply gradients
     with tf.control_dependencies([lossAveragesOp]):
         optimizer = tf.train.GradientDescentOptimizer(lr)
-        gradients = optimizer.compute_gradients(totalLoss)
+        gradients = optimizer.compute_gradients(meanLoss)
 
     # apply gradients
-    applyGradientOp = optimizer.apply_gradients(gradients, globalStep)
+    applyGradientOp = optimizer.apply_gradients(gradients, globalStep, name="ApplyGradient")
 
     # add histograms for the weights and biases
     for variable in tf.trainable_variables():

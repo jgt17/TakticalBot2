@@ -45,6 +45,8 @@ class GameState:
         self.__whiteCapstonesAvailable = GameState.capstonesAvailable[boardSize] - self.pieceCounts[4]
         self.__blackCapstonesAvailable = GameState.capstonesAvailable[boardSize] - self.pieceCounts[4]
 
+        self.score = 0
+
     # applies a move, given a move specification string
     # enforces tak rules
     def applyMove(self, moveSpecificationString, isPTN=True):
@@ -187,10 +189,9 @@ class GameState:
 
     # returns evaluation of the quality of the board for white
     def score(self):
-        # todo
-        return 0
+        return self.score
 
-    # returns data about the board in the appropriate format to feed to the DANN
+    # returns data about the board in the appropriate format to feed to the CNN for training
     def toNetworkInputs(self):
         flatContents = []
         # row by col by stack + counts
@@ -198,6 +199,15 @@ class GameState:
             for j in range(self.boardSize):
                 flatContents += self.board[j][i].toNetworkInputs()
         return bytes(flatContents), bytes(self.flatBoard.getPieceCounts())
+
+    # returns data about the board in the appropriate format to feed the CNN for playing
+    def toNetworkApplyInputs(self):
+        # noinspection PyUnusedLocal
+        contents = [[0 for i in range(self.boardSize)] for i in range(self.boardSize)]
+        for i in range(self.boardSize):
+            for j in range(self.boardSize):
+                contents[i][j] = self.board[j][i].toNetworkInputs()
+        return contents, self.pieceCounts
 
     # returns a list of all permutations of the board
     # for increasing training data
