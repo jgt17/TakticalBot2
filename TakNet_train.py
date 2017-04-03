@@ -5,8 +5,7 @@ import time
 import tensorflow as tf
 
 FLAGS = tf.app.flags.FLAGS
-
-tf.app.flags.DEFINE_string('trainDir', 'tak_train_test', """Directory where to write event logs and checkpoint.""")
+tf.app.flags.DEFINE_string('trainDir', 'trained_models/tak_train_test', """Directory where to write event logs and checkpoint.""")
 tf.app.flags.DEFINE_integer('maxSteps', 40200, """Number of batches to run.""")
 
 

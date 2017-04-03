@@ -1,5 +1,8 @@
-/ParsedGameStates/**
-/PermutedGameStates/**
-/NetworkReadyGameStateRepresentations/**
 /tak_train/**
-/tak_train*
+tak_train*/
+trained_models/
+NetworkReadyGameStateRepresentations/
+ParsedGameStates/
+RawDatabase/
+PermutedGameStates/
+__pycache__/

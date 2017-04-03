@@ -7,9 +7,12 @@ To train, run TakNet_train.py
 Copy the checkpoint, events..., graph.pptxt, and model.ckpt-* files you want to use into the Network folder
 
 To create the files to train from:
-run ParseGameStates.py on RawDatabase/FilteredGames
-run GeneratePermutations.py
+run ParseGameStates.py on RawDatabase/FilteredGames, then
+run GeneratePermutations.py, then
 run TakNet_input.py
+
+Model Name Schema:
+
 
 This implementation uses
 (mostly compliant) Portable Tak Notation (PTN)
@@ -18,6 +21,6 @@ https://www.reddit.com/r/Tak/wiki/portable_tak_notation
 and Tak Positional System (TPS)
 https://www.reddit.com/r/Tak/wiki/tak_positional_system
 
-The raw dataset it from www.playtak.com/games
+The raw dataset is from www.playtak.com/games
 
 TensorFlow was used extensively for the CNN portion, www.tensorflow.org
