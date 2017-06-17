@@ -17,6 +17,11 @@ class GameState:
     # capstones available for each board size
     capstonesAvailable = {3: 0, 4: 0, 5: 1, 6: 1, 7: 2, 8: 2}
 
+    whiteWon = 1
+    blackWon = -1
+    draw = 0
+    ongoing = 2
+
     def __init__(self,
                  boardSize=5,
                  board=None,

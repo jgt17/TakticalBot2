@@ -2,6 +2,7 @@
 # this is a flattened version of the board containing only those pieces
 # making it easier to find win conditions
 
+from GameState import GameState
 
 class FlatBoard:
 
@@ -16,15 +17,14 @@ class FlatBoard:
                 self.flatBoard[i][j] = gameState.board[i][j].top()
         self.winner = self.checkVictory()
 
-    # fixme
     def checkVictory(self):
         r = self.__checkRoadVictory()
-        if r != 0:      # road victory takes priority over flats victory
+        if not (r == GameState.ongoing or r == GameState.draw):      # road victory takes priority over flats victory
             return r
         elif self.blackPiecesLeft == 0 or self.whitePiecesLeft == 0 or self.__boardIsCovered():
             return self.__checkFlatVictory()
         else:
-            return 2
+            return GameState.ongoing
 
     def __checkRoadVictory(self):
         boardSize = len(self.flatBoard)
@@ -35,22 +35,22 @@ class FlatBoard:
             bottomEdge.add((i, -1))
         if self.__roadExists(leftEdge, boardSize, "horizontal", 1)\
                 or self.__roadExists(bottomEdge, boardSize, "vertical", 1):
-            return 1
+            return GameState.whiteWon
         elif self.__roadExists(leftEdge, boardSize, "horizontal", -1)\
                 or self.__roadExists(bottomEdge, boardSize, "vertical", -1):
-            return -1
+            return GameState.blackWon
         else:
-            return 2
+            return GameState.ongoing
 
     def __checkFlatVictory(self):
         whiteCount, blackCount, _, _, _, _ = self.getPieceCounts()
 
         if whiteCount > blackCount:
-            return 1
+            return GameState.whiteWon
         elif blackCount > whiteCount:
-            return -1
+            return GameState.blackWon
         else:
-            return 0
+            return GameState.draw
 
     def getPieceCounts(self):
         whiteCount = 0
