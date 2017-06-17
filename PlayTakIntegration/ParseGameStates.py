@@ -18,6 +18,7 @@ parsedGamesFilename = "parsedGames"
 
 def parseGamesFromCSV(csvFile):
     csvReader = csv.reader(csvFile, delimiter=';', quotechar='"')
+    # fixme
     # assumes between 80,000 and 90,000 ish entries
     # this is terrible practice, but runs orders of magnitude
     # faster than doing it in a way that supports multiple data sets
