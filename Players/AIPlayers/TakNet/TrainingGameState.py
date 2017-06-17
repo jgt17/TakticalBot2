@@ -1,6 +1,3 @@
-from GameState import GameState
-
-
 class TrainingGameState:
     def __init__(self, gameState, trainingScore):
         self.gameState = gameState

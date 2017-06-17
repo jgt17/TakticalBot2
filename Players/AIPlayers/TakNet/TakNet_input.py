@@ -1,8 +1,7 @@
-from GameState import GameState
-
-import tensorflow as tf
 import os
 import pickle
+
+import tensorflow as tf
 
 
 def _float_feature(value):

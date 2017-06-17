@@ -1,10 +1,11 @@
-from GameState import GameState
-from TrainingGameState import TrainingGameState
+import copy
+import csv
+import pickle
+
 from NotationConverter import toPTN
 
-import csv
-import copy
-import pickle
+from Game.GameState import GameState
+from Players.AIPlayers.TakNet.TrainingGameState import TrainingGameState
 
 # parses csv file of the filtered database (for size=5 and a game that ended in something other than a player resigning)
 # to a pickled file which is a list of lists of TrainingGameStates

@@ -1,5 +1,6 @@
 from copy import copy
-from TakException import TakException
+
+from Game.TakException import TakException
 
 
 class Stack:

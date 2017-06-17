@@ -1,5 +1,8 @@
 import string
 
+from PlayTakIntegration import NotationConverter
+
+
 class MoveSpecification:
 
     pieceLetterToNumber = {"F": 1, "S": 2, "C": 3}
@@ -50,17 +53,12 @@ class MoveSpecification:
                 self.file = self.fileLetterToIndex[moveSpecificationString[0]]
                 self.rank = int(moveSpecificationString[1]) - 1
 
-
     # converts a move from Server notation to PTN
     @staticmethod
     def toPTNFromServer(moveString):
-        #todo
-        return moveString
-
+        return NotationConverter.toPTN(moveString)
 
     # converts a move from PTN to Server notation
     @staticmethod
-    def toServerFromPTN(movestring):
-        #todo
-        return movestring
-
+    def toServerFromPTN(moveString):
+        return NotationConverter.toServerNotation(moveString)

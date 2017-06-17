@@ -1,11 +1,12 @@
-from Stack import Stack
-from MoveSpecification import MoveSpecification
-from FlatBoard import FlatBoard
-from Misc import compositions
-from TakException import TakException
-
-import string
 import copy
+import string
+
+from Game.MoveSpecification import MoveSpecification
+from Game.Stack import Stack
+
+from Game.FlatBoard import FlatBoard
+from Game.TakException import TakException
+from Misc import compositions
 
 
 class GameState:
@@ -126,6 +127,11 @@ class GameState:
         new.turnIndicator *= -1
         new.turnCount += 1
         return new
+
+    # checks whether the move specified is valid for the current GameState
+    def checkMove(self, moveSpecificationString, isPTN=True):
+        # todo
+        raise NotImplementedError
 
     # checks whether a player has won
     # returns 1 if white won, -1 if black won, 0 if it is a draw, and 2 if the game isn't over

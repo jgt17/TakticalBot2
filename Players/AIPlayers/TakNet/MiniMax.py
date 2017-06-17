@@ -1,6 +1,6 @@
-from TakException import TakException
-
 import numpy as np
+
+from Game.TakException import TakException
 
 
 def __miniMaxHelper(gameState, tfSession, inferenceOp, boardPH, pieceCountPH, depth, alpha, beta, player1):

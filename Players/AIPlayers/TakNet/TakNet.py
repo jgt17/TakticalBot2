@@ -1,7 +1,6 @@
-import TakNet_input
-
 import tensorflow as tf
-import os
+
+from Players.AIPlayers.TakNet import TakNet_input
 
 # the nueral network for TakticalAI
 # input format: 5x5x8 (stack x column x row) and 6 (piece counts)

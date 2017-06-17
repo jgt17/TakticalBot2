@@ -2,6 +2,7 @@
 # standard tak notation is PTN: https://www.reddit.com/r/Tak/wiki/portable_tak_notation
 # the server uses it's own notation: https://github.com/chaitu236/TakServer/blob/master/README.md
 
+
 # converts a move specificaton string from portable tak notation (PTN) to server notation
 def toServerNotation(ptn):
     #todo

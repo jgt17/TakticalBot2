@@ -2,7 +2,7 @@
 # this is a flattened version of the board containing only those pieces
 # making it easier to find win conditions
 
-from GameState import GameState
+from Game.GameState import GameState
 
 class FlatBoard:
 

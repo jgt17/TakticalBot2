@@ -1,4 +1,5 @@
-from GameState import GameState
+from Game.GameState import GameState
+
 
 class GameManager:
 
@@ -20,7 +21,7 @@ class GameManager:
     def playGame(self):
         move = self.whitePlayer.getMove(self.board)
         self.history.append(move)
-        self.board.applyMove()
+        self.board.applyMove(move)
 
         status = self.board.checkVictory()
         if status != GameState.ongoing:
@@ -28,7 +29,7 @@ class GameManager:
 
         move = self.blackPlayer.getMove(self.board)
         self.history.append(move)
-        self.board.applyMove()
+        self.board.applyMove(move)
 
         status = self.board.checkVictory()
         if status != GameState.ongoing:

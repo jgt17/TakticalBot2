@@ -1,10 +1,11 @@
-from GameState import GameState
-from MiniMax import miniMax
-from TakException import TakException
-import TakNet
-
-import tensorflow as tf
 import time
+
+import TakNet
+import tensorflow as tf
+from GameState import GameState
+
+from Game.TakException import TakException
+from Players.AIPlayers.TakNet.MiniMax import miniMax
 
 NETWORK_TO_USE = ""
 

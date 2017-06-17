@@ -1,8 +1,9 @@
-import TakNet
-
-from datetime import datetime
 import time
+from datetime import datetime
+
 import tensorflow as tf
+
+from Players.AIPlayers.TakNet import TakNet
 
 FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('trainDir', 'trained_models/tak_train_test', """Directory where to write event logs and checkpoint.""")
