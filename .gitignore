@@ -7,3 +7,4 @@ RawDatabase/
 PermutedGameStates/
 __pycache__/
 .idea/
+*.xml

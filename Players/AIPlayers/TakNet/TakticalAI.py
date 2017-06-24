@@ -1,8 +1,8 @@
 import time
 
-import TakNet
+from Players.AIPlayers import TakNet
 import tensorflow as tf
-from GameState import GameState
+from Game.GameState import GameState
 
 from Game.TakException import TakException
 from Players.AIPlayers.TakNet.MiniMax import miniMax

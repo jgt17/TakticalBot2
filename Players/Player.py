@@ -14,3 +14,13 @@ class Player(ABC):
     @abstractmethod
     def getMove(self, board):
         raise NotImplementedError
+
+    # used to notify the player that they won the game
+    @abstractmethod
+    def won(self):
+        raise NotImplementedError
+
+    # used to notify the player that they lost the game
+    @abstractmethod
+    def lost(self):
+        raise NotImplementedError

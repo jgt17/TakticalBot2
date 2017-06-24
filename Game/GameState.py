@@ -3,25 +3,15 @@ import string
 
 from Game.MoveSpecification import MoveSpecification
 from Game.Stack import Stack
-
 from Game.FlatBoard import FlatBoard
 from Game.TakException import TakException
 from Misc import compositions
+from Game import TakConstants
 
 
 class GameState:
     # Class representing the state of the board
     # file is outer list, rank is inner list
-
-    # stones available for each board size
-    piecesAvailable = {3: 10, 4: 15, 5: 21, 6: 30, 7: 40, 8: 50}
-    # capstones available for each board size
-    capstonesAvailable = {3: 0, 4: 0, 5: 1, 6: 1, 7: 2, 8: 2}
-
-    whiteWon = 1
-    blackWon = -1
-    draw = 0
-    ongoing = 2
 
     def __init__(self,
                  boardSize=5,
@@ -38,18 +28,18 @@ class GameState:
         whiteStonesOnBoard, blackStonesOnBoard = self.countStonesOnBoard()
 
         self.__whitePiecesPlayed = whiteStonesOnBoard
-        self.whitePiecesRemaining = GameState.piecesAvailable[boardSize] - self.__whitePiecesPlayed
+        self.whitePiecesRemaining = TakConstants.piecesAvailable[boardSize] - self.__whitePiecesPlayed
 
         self.__blackPiecesPlayed = blackStonesOnBoard
-        self.blackPiecesRemaining = GameState.piecesAvailable[boardSize] - self.__blackPiecesPlayed
+        self.blackPiecesRemaining = TakConstants.piecesAvailable[boardSize] - self.__blackPiecesPlayed
 
         self.__carryLimit = self.boardSize
 
         self.flatBoard = FlatBoard(self)
         self.pieceCounts = self.flatBoard.getPieceCounts()
 
-        self.__whiteCapstonesAvailable = GameState.capstonesAvailable[boardSize] - self.pieceCounts[4]
-        self.__blackCapstonesAvailable = GameState.capstonesAvailable[boardSize] - self.pieceCounts[4]
+        self.__whiteCapstonesAvailable = TakConstants.capstonesAvailable[boardSize] - self.pieceCounts[4]
+        self.__blackCapstonesAvailable = TakConstants.capstonesAvailable[boardSize] - self.pieceCounts[4]
 
         self.score = 0
 
@@ -118,7 +108,7 @@ class GameState:
                     elif direction == "-":
                         rank -= 1
                     else:
-                        raise TakException("invalid movement direction:", direction)
+                        raise TakException("Invalid movement direction:", direction)
                     if not new.__inBounds(file, rank):
                         raise TakException("Cannot drop tiles onto " + str(file) + "," + str(rank) +
                                            ", it is off the board " + moveSpecificationString)
@@ -129,9 +119,13 @@ class GameState:
         return new
 
     # checks whether the move specified is valid for the current GameState
+    # returns True/False and message explaining any violation (empty string if none)
     def checkMove(self, moveSpecificationString, isPTN=True):
-        # todo
-        raise NotImplementedError
+        try:
+            self.applyMove(moveSpecificationString, isPTN)
+            return True
+        except TakException as e:
+            return False
 
     # checks whether a player has won
     # returns 1 if white won, -1 if black won, 0 if it is a draw, and 2 if the game isn't over
