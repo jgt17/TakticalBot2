@@ -1,4 +1,6 @@
 from Game.GameState import GameState
+from Game import TakConstants
+from Players.UserPlayers.ConsolePlayer import ConsolePlayer
 
 
 class GameManager:
@@ -19,18 +21,33 @@ class GameManager:
         self.blackPlayer = newPlayer
 
     def playGame(self):
-        move = self.whitePlayer.getMove(self.board)
-        self.history.append(move)
-        self.board.applyMove(move)
+        status = TakConstants.ongoing
+        while True:
+            move = self.whitePlayer.getMove(self.board)
+            self.history.append(move)
+            self.board = self.board.applyMove(move)
 
-        status = self.board.checkVictory()
-        if status != GameState.ongoing:
-            return self.board, self.history, status
+            status = self.board.checkVictory()
+            if status != TakConstants.ongoing:
+                break
 
-        move = self.blackPlayer.getMove(self.board)
-        self.history.append(move)
-        self.board.applyMove(move)
+            move = self.blackPlayer.getMove(self.board)
+            self.history.append(move)
+            self.board = self.board.applyMove(move)
 
-        status = self.board.checkVictory()
-        if status != GameState.ongoing:
-            return self.board, self.history, status
+            status = self.board.checkVictory()
+            if status != TakConstants.ongoing:
+                break
+
+        if status == TakConstants.whiteWon:
+            self.whitePlayer.won()
+            self.blackPlayer.lost()
+        else:
+            self.whitePlayer.lost()
+            self.blackPlayer.won()
+
+        return self.board, self.history, status
+
+
+if __name__ == "__main__":
+    GameManager(ConsolePlayer(True, "White"), ConsolePlayer(False, "Black")).playGame()
