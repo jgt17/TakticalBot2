@@ -1,8 +1,9 @@
 from copy import copy
+import numpy as np
 
 from Game.TakException import TakException
 
-# todo rework stack representation to pair of booleans for each piece
+
 class Stack:
     # class representing the the stack of pieces on a square of the board
 
@@ -120,11 +121,25 @@ class Stack:
         conv = {-1: "2", 1: "1", -2: "2S", 2: "1S", -3: "2C", 3: "1C"}
         return ''.join([conv[piece] for piece in self.__pieces])
 
+    # todo adjust to game size
     def toNetworkInputs(self):
         pieces = self.__pieces[-5:]
-        pieces = [0]*(6-len(pieces)) + pieces + [0, 0]
-        if self.isCapstone(self.top):
-            pieces[-3:] = [0, 0, int(self.top()/3)]
-        elif self.isStandingStone(self.top()):
-            pieces[-3:] = [0, int(self.top()/2), 0]
-        return [n % 256 for n in [0]*(5 - len(pieces)) + pieces]
+        pieces = [0]*(6 - len(pieces)) + pieces
+        inputs = np.full((len(pieces), 4), False, dtype=bool)
+        for i in range(len(pieces)):
+            if pieces[i] != 0:
+                # mark owner
+                if pieces[i] > 0:
+                    inputs[i, 0] = True
+                else:
+                    inputs[i, 1] = True
+                # mark piece type
+                piece = abs(pieces[i])
+                if piece[i] == 1:
+                    inputs[i, 2] = True
+                elif piece[i] == 2:
+                    inputs[i, 3] = True
+                else:
+                    # capstone is basically road and wall both, so makes sense to mark this way
+                    inputs[i, 2:] = True
+        return inputs.flatten()
