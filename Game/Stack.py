@@ -1,4 +1,5 @@
 from copy import copy
+
 import numpy as np
 
 from Game.TakException import TakException
@@ -15,7 +16,11 @@ class Stack:
     __whiteStandingStone = 2  # can only be on top
     __whiteCapstone = 3  # can only be on top
 
-    def __init__(self, pieces=None, stack=None):
+    # carry limit
+    # relies on only one size of game being played at once
+    carryLimit = None
+
+    def __init__(self, pieces=None, stack=None, carryLimit=5):
         self.__pieces = None
 
         if pieces is not None:
@@ -24,6 +29,9 @@ class Stack:
             self.__pieces = copy(stack.__peices)
         else:
             self.__pieces = []
+
+        if Stack.carryLimit is None:
+            Stack.carryLimit = carryLimit
 
     # add pieces to a stack, enforcing tak rules
     def place(self, number, stack=None):
@@ -121,25 +129,25 @@ class Stack:
         conv = {-1: "2", 1: "1", -2: "2S", 2: "1S", -3: "2C", 3: "1C"}
         return ''.join([conv[piece] for piece in self.__pieces])
 
-    # todo adjust to game size
+    # todo don't forget to handle extra bits introduced by even board sizes when unpacking examples
     def toNetworkInputs(self):
-        pieces = self.__pieces[-5:]
-        pieces = [0]*(6 - len(pieces)) + pieces
-        inputs = np.full((len(pieces), 4), False, dtype=bool)
+        pieces = self.__pieces[-Stack.carryLimit:]
+        pieces = [0] * (Stack.carryLimit + 1 - len(pieces)) + pieces
+        inputs = np.zeros((len(pieces), 4))
         for i in range(len(pieces)):
             if pieces[i] != 0:
                 # mark owner
                 if pieces[i] > 0:
-                    inputs[i, 0] = True
+                    inputs[i, 0] = 1
                 else:
-                    inputs[i, 1] = True
+                    inputs[i, 1] = 1
                 # mark piece type
                 piece = abs(pieces[i])
                 if piece[i] == 1:
-                    inputs[i, 2] = True
+                    inputs[i, 2] = 1
                 elif piece[i] == 2:
-                    inputs[i, 3] = True
+                    inputs[i, 3] = 1
                 else:
                     # capstone is basically road and wall both, so makes sense to mark this way
-                    inputs[i, 2:] = True
-        return inputs.flatten()
+                    inputs[i, 2:] = 1
+        return np.packbits(inputs)
