@@ -19,16 +19,33 @@ class TakNet:
 
     def _buildModel(self, boardSize, weightsToUse=None):
         # create network
+        #todo
         raise NotImplementedError
 
     # add state and target value to training data
-    def remember(self, state, nextStateTargetValue):
-        self.memory.append((state, nextStateTargetValue))
+    def remember(self, state, stateTargetValue):
+        self.memory.append((state, stateTargetValue))
+
+    # add many states and target values to training data
+    def rememberAll(self, statesAndTargetValues):
+        self.memory += statesAndTargetValues
 
     def replay(self, batchSize):
         # replay
+        # todo
         raise NotImplementedError
 
-    # evaluate the value of game states
-    def eval(self, states):
+    # evaluate the value of game states using the value set of weights
+    def evalStateValues(self, states):
+        # todo
         return self.model.predict(states)
+
+    # evaluate the value of game states using the self set of weights
+    def evalSelfMoves(self, states):
+        # todo
+        pass
+
+    # evaluate the value of game states using the opponent set of weights
+    def evalOpponentMoves(self, states):
+        # todo
+        pass

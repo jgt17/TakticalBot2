@@ -2,7 +2,7 @@ from copy import copy
 
 from Game.TakException import TakException
 
-
+# todo rework stack representation to pair of booleans for each piece
 class Stack:
     # class representing the the stack of pieces on a square of the board
 

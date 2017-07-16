@@ -47,6 +47,8 @@ class GameState:
     # enforces tak rules
     def applyMove(self, moveSpecificationString, isPTN=True):
         new = copy.deepcopy(self)
+        if new.isTerminal():
+            return new
         moveSpecification = MoveSpecification(moveSpecificationString, isPTN)
         # placement moves
         if moveSpecification.isPlacementMove:
@@ -118,6 +120,20 @@ class GameState:
         new.turnCount += 1
         return new
 
+    # applies every move in a list of moves to the gamestate, pruning any illegal moves
+    # returns a list of legal (move, resulting gamestate) tuples
+    def applyMoves(self, moves, arePTN=True):
+        legalMoves = list()
+        for move in moves:
+            try:
+                nextState = self.applyMove(moves, arePTN)
+                legalMoves.append((move,nextState))
+            except TakException:
+                # move was illegal, don't add to the list
+                pass
+        return legalMoves
+
+
     # checks whether the move specified is valid for the current GameState
     # returns True/False and message explaining any violation (empty string if none)
     def checkMove(self, moveSpecificationString, isPTN=True):
@@ -131,6 +147,10 @@ class GameState:
     # returns 1 if white won, -1 if black won, 0 if it is a draw, and 2 if the game isn't over
     def checkVictory(self):
         return FlatBoard(self).checkVictory()
+
+    # checks whether the game is in a terminal state
+    def isTerminal(self):
+        return self.checkVictory() != 2
 
     # returns a list of all possible moves
     def generateMoves(self):
