@@ -1,12 +1,12 @@
 import copy
 import string
 
+from Game import TakConstants
+from Game.FlatBoard import FlatBoard
 from Game.MoveSpecification import MoveSpecification
 from Game.Stack import Stack
-from Game.FlatBoard import FlatBoard
 from Game.TakException import TakException
 from Misc import compositions
-from Game import TakConstants
 
 
 class GameState:
@@ -223,7 +223,7 @@ class GameState:
         for i in range(self.boardSize):
             for j in range(self.boardSize):
                 flatContents += self.board[j][i].toNetworkInputs()
-        return bytes(flatContents), bytes(self.flatBoard.getPieceCounts())
+        return flatContents, self.flatBoard.getPieceCounts()
 
     # returns data about the board in the appropriate format to feed the CNN for playing
     def toNetworkApplyInputs(self):

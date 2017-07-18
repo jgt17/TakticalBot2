@@ -1,23 +1,32 @@
 from random import random, choice
 
-from Players.Player import Player
 from Game.GameState import GameState
 from Players.AIPlayers.TakNet2.TakNet import TakNet
+from Players.AIPlayers.TakNet2.Train import gamma, epsilon, rememberAll
+from Players.Player import Player
 
-from Players.AIPlayers.TakNet2.Train import gamma, epsilon
+
 # todo decide where to store training variables
 
 
 class TakticalBot(Player):
 
     # initialize player
-    def __init__(self, isWhitePlayer, playerName, boardSize=5, modelToUse=None, weightsToUse=None):
+    def __init__(self, isWhitePlayer, playerName, boardSize=5, version=None,
+                 evaluationWeights=None, selectionWeights=None, training=False):
         super().__init__(isWhitePlayer, playerName)
-        self.takNet = TakNet(boardSize, modelToUse, weightsToUse)
+        if version is not None:
+            # todo load weights from save files
+            pass
+        self.evaluationTakNet = TakNet(boardSize, evaluationWeights)  # target network
+        self.selectionTakNet = TakNet(boardSize, selectionWeights)  # "live" network
+        self.training = training
         raise NotImplementedError
 
     # choose a move
-    def getMove(self, board: GameState, training=False):
+    def getMove(self, board: GameState, training=None):
+        if training is None:
+            training = self.training
         if training and random() < epsilon:
             # do random move for exploration
             move, oppState = choice(board.applyMoves(board.generateMoves()))
@@ -26,9 +35,9 @@ class TakticalBot(Player):
             _, move, nextState = self.evalMoves(board)
 
         if training:
-            # which of these to use? both? todo
+            # which of these to use? both? todo decide
             # remember what really happened
-            self.remember(board, gamma * self.takNet.evalStateValues([nextState])[0])
+            self.remember(board, gamma * self.evaluationTakNet.eval([nextState])[0])
             # remember minimax prediction
             self.remember(nextState, self.targetValue(nextState))
 
@@ -52,10 +61,10 @@ class TakticalBot(Player):
             for _, finalState in newState.applyMoves(newState.generateMoves()):
                 finalStates.append(finalState)
             moveValue, worstNextState = minStep(
-                zip(self.takNet.evalOpponentMoves(self.asExamples(finalStates)), finalStates))
+                zip(self.selectionTakNet.eval(self.asExamples(finalStates)), finalStates))
             worstNextStates.append(worstNextState)
         valueMoveAndState = maxStep(
-            zip(self.takNet.evalSelfMoves(self.asExamples(worstNextStates)), moves, worstNextStates))
+            zip(self.selectionTakNet.eval(self.asExamples(worstNextStates)), moves, worstNextStates))
         return valueMoveAndState
 
     # get worst case opponent move, for eval use in exploration cases
@@ -68,13 +77,12 @@ class TakticalBot(Player):
         for _, finalState in oppState.applyMoves(oppState.generateMoves()):
             finalStates.append(finalState)
         _, worstNextState = minStep(
-            zip(self.takNet.evalOpponentMoves(self.asExamples(finalStates)), finalStates))
+            zip(self.selectionTakNet.eval(self.asExamples(finalStates)), finalStates))
         return worstNextState
 
     # convert a list of GameStates into a list of TakNet-ready examples
     def asExamples(self, states):
-        # todo
-        pass
+        return [state.toNetworkInputs() for state in states]
 
     # calculate the new target value of a state
     # here rather than in Train.py or TakNet.py to avoid needing to re-instantiate the GameStates
@@ -84,7 +92,7 @@ class TakticalBot(Player):
             return result   # -1 if white lost, 0 if draw, 1 if white won
         else:
             _, _, nextState = self.evalMoves(state)
-            return gamma * self.takNet.evalStateValues(self.asExamples([nextState]))[0]
+            return gamma * self.evaluationTakNet.eval(self.asExamples([nextState]))[0]
 
     # add a gameState and it's permutations, with target values, to takNet's training buffer
     def remember(self, gameState, targetValue):
@@ -95,7 +103,7 @@ class TakticalBot(Player):
             permutations.append((permutation, targetValue))
         for permutation in invertedPermutations:
             permutations.append((permutation, -targetValue))
-        self.takNet.rememberAll(permutations)
+        rememberAll(permutations)
 
     def won(self):
         pass

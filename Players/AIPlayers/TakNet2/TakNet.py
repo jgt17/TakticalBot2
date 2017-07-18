@@ -1,53 +1,89 @@
-from collections import deque
-
-from keras.models import load_model
+from keras.layers import Input, concatenate
+from keras.layers.convolutional import Conv2D, Conv3D
+from keras.layers.core import Reshape, Dense
+from keras.models import Model
+from numpy import unpackbits
 
 
 class TakNet:
-    def __init__(self, boardSize=5, modelToUse=None, weightsToUse=None):
-        self.memory = deque(maxlen=20000000)
-        self.gamma = 0.95           # discount rate
-        self.epsilon = 1.0          # exploration rate
-        self.epsilon_min = 0.01     # min exploration rate
-        self.epsilon_decay = 0.995  # exploration rate decay rate
-        self.learning_rate = 0.01   # learning rate
-        self.batch_size = 10000
-        self.batches_per_epoch = 100
-        if modelToUse is not None:
-            # todo auto-select file from board size (after implement board sizes other than 5)
-            self.model = load_model(modelToUse)
-        elif weightsToUse is not None:
-            self.model = self._buildModel(boardSize, weightsToUse)
+    # Basic network structure:
+    # Layer 1: Convolutions on individual stacks
+    # Layer 2: Convolutions on 3x3 areas
+    # Layer 3: Fully connected layer (inject board stats here)
+    # Layer 4: Fully connected layer
+    # Layer 5: Output Layer
+
+    def __init__(self, boardSize=5, weightsToUse=None):
+        self.boardSize = boardSize
+        self.layer1NumberOfFilters = (boardSize + 1) * 4
+        self.layer2NumberOfFilters = boardSize * 10
+        self.layer3Size = boardSize * 20
+        self.layer4Size = boardSize * 10
+        self.boardMetadataPreprocessingSize = 4
+        self.model = self._buildModel(boardSize, weightsToUse)
 
     def _buildModel(self, boardSize, weightsToUse=None):
         # create network
-        #todo
-        raise NotImplementedError
+        # Board Input
+        boardIn = Input((boardSize, boardSize, boardSize + 1, 4))
+        # Layer 1: Convolution on stacks
+        stackConv = Conv3D(self.layer1NumberOfFilters,
+                           (1, 1, boardSize + 1),
+                           strides=(1, 1, 1),
+                           padding='valid',
+                           activation='tanh',
+                           use_bias=True,
+                           kernel_initializer='glorot_uniform',
+                           bias_initializer='zeros',
+                           kernel_regularizer=None,
+                           bias_regularizer=None,
+                           activity_regularizer=None,
+                           kernel_constraint=None,
+                           bias_constraint=None)(boardIn)
+        # reshape
+        stackConv = (Reshape((boardSize, boardSize, self.layer1NumberOfFilters)))(stackConv)
+        # Layer 2: Convolution on 3x3 areas
+        boardConv = Conv2D(self.layer2NumberOfFilters,
+                           (3, 3),
+                           strides=(1, 1),
+                           padding='valid',
+                           activation='tanh',
+                           use_bias=True,
+                           kernel_initializer='glorot_uniform',
+                           bias_initializer='zeros')(stackConv)
+        # Piece Count Inputs
+        pieceCounts = Input((6,))
+        # Piece Count Preprocessing
+        pieceCounts = Dense(self.boardMetadataPreprocessingSize, activation='tanh')(pieceCounts)
+        # Merge board and piece counts
+        jointInput = concatenate([boardConv, pieceCounts])
+        # Layer 3
+        layer3 = Dense(self.layer3Size, activation='tanh')(jointInput)
+        # Layer 4
+        layer4 = Dense(self.layer4Size, activation='tanh')(layer3)
+        # Output
+        output = Dense(1, activation='tanh')(layer4)
 
-    # add state and target value to training data
-    def remember(self, state, stateTargetValue):
-        self.memory.append((state, stateTargetValue))
+        model = Model(inputs=[boardIn, pieceCounts], outputs=[output])
+        return model
 
-    # add many states and target values to training data
-    def rememberAll(self, statesAndTargetValues):
-        self.memory += statesAndTargetValues
+    def getWeights(self):
+        return self.model.weights
 
-    def replay(self, batchSize):
-        # replay
-        # todo
-        raise NotImplementedError
+    def setWeights(self, weights):
+        self.model.set_weights(weights)
 
-    # evaluate the value of game states using the value set of weights
-    def evalStateValues(self, states):
-        # todo
-        return self.model.predict(states)
-
-    # evaluate the value of game states using the self set of weights
-    def evalSelfMoves(self, states):
-        # todo
-        pass
-
-    # evaluate the value of game states using the opponent set of weights
-    def evalOpponentMoves(self, states):
-        # todo
-        pass
+    # evaluate the states according to this networks weights
+    def eval(self, states):
+        boardStates = list()
+        pieceCounts = list()
+        for state in states:
+            pieceCounts.append(state[1])
+            board = state[0]
+            if self.boardSize % 2 == 0:
+                board.reshape((self.boardSize, self.boardSize, -1))
+                board = board[self.boardSize, self.boardSize, :-4]
+            board = unpackbits(board)
+            board.reshape((self.boardSize, self.boardSize, self.boardSize + 1, 4))
+            boardStates.append(board)
+        return self.model.predict([boardStates, pieceCounts])

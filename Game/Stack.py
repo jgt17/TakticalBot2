@@ -129,7 +129,6 @@ class Stack:
         conv = {-1: "2", 1: "1", -2: "2S", 2: "1S", -3: "2C", 3: "1C"}
         return ''.join([conv[piece] for piece in self.__pieces])
 
-    # todo don't forget to handle extra bits introduced by even board sizes when unpacking examples
     def toNetworkInputs(self):
         pieces = self.__pieces[-Stack.carryLimit:]
         pieces = [0] * (Stack.carryLimit + 1 - len(pieces)) + pieces
