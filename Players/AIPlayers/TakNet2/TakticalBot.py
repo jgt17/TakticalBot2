@@ -1,7 +1,7 @@
 from random import random, choice
 
 from Game.GameState import GameState
-from Players.AIPlayers.TakNet2 import Train
+from Players.AIPlayers.TakNet2 import Train, util
 from Players.AIPlayers.TakNet2.TakNet import TakNet
 from Players.Player import Player
 
@@ -12,14 +12,23 @@ from Players.Player import Player
 class TakticalBot(Player):
 
     # initialize player
-    def __init__(self, isWhitePlayer, playerName, boardSize=5, version=None,
-                 evaluationWeights=None, selectionWeights=None, training=False):
+    def __init__(self, isWhitePlayer, playerName=None, boardSize=5, version=None,
+                 evaluationWeights=None, selectionWeights=None, training=False,
+                 evaluationNetwork=None, selectionNetwork=None):
         super().__init__(isWhitePlayer, playerName)
         if version is not None:
-            # todo load weights from save files
-            pass
-        self.evaluationTakNet = TakNet(boardSize, evaluationWeights)  # target network
-        self.selectionTakNet = TakNet(boardSize, selectionWeights)  # "live" network
+            weights = util.loadWeights(boardSize, version)
+            self.evaluationTakNet = TakNet(boardSize, weights)
+            self.selectionTakNet = TakNet(boardSize, weights)
+        else:
+            if evaluationNetwork is None:
+                self.evaluationTakNet = TakNet(boardSize, evaluationWeights)  # target network
+            else:
+                self.evaluationTakNet = evaluationNetwork
+            if evaluationNetwork is None:
+                self.selectionTakNet = TakNet(boardSize, selectionWeights)  # "live" network
+            else:
+                self.selectionTakNet = selectionNetwork
         self.training = training
         raise NotImplementedError
 

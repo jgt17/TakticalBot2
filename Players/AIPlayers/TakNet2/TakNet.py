@@ -1,12 +1,11 @@
-import pickle
-
 from keras.layers import Input, concatenate
 from keras.layers.convolutional import Conv2D, Conv3D
 from keras.layers.core import Reshape, Dense
 from keras.models import Model
+from keras.optimizers import SGD
 from numpy import unpackbits
 
-from Players.AIPlayers.TakNet2 import util
+from Players.AIPlayers.TakNet2 import Train
 
 
 class TakNet:
@@ -17,7 +16,7 @@ class TakNet:
     # Layer 4: Fully connected layer
     # Layer 5: Output Layer
 
-    def __init__(self, boardSize=5, weightsToUse=None):
+    def __init__(self, boardSize=5, weightsToUse=None, training=False):
         self.boardSize = boardSize
         self.layer1NumberOfFilters = (boardSize + 1) * 4
         self.layer2NumberOfFilters = boardSize * 10
@@ -27,15 +26,8 @@ class TakNet:
         self.model = self._buildModel(boardSize, weightsToUse)
         if weightsToUse is not None:
             self.setWeights(weightsToUse)
-
-    @staticmethod
-    def loadNetwork(boardSize=5, version="latest"):
-        try:
-            weights = pickle.load(util.networkFolder + "/" + util.formatNetworkFileName(boardSize, version))
-            return TakNet(boardSize, weights)
-        except IOError:
-            print("File not found: " + util.networkFolder + "/" + util.formatNetworkFileName(boardSize, version))
-            exit(1)
+        if training:
+            self.model.compile(optimizer=SGD(lr=Train.learning_rate), loss="mean_squared_error", metrics=["accuracy"])
 
     def _buildModel(self, boardSize, weightsToUse=None):
         # create network
@@ -102,3 +94,14 @@ class TakNet:
             board.reshape((self.boardSize, self.boardSize, self.boardSize + 1, 4))
             boardStates.append(board)
         return self.model.predict([boardStates, pieceCounts])
+
+    # train the network on a minibatch of examples
+    def train(self, minibatch):
+        boards = list()
+        pieceCounts = list()
+        targets = list()
+        for example in minibatch:
+            boards.append(example[0][0])
+            pieceCounts.append(example[0][1])
+            targets.append(example[1])
+        self.model.train_on_batch([boards, pieceCounts], targets)

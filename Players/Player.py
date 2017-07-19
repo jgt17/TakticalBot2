@@ -3,10 +3,15 @@ from abc import ABC, abstractmethod
 
 # abstract player class
 class Player(ABC):
-
-    def __init__(self, isWhitePlayer, playerName):
+    def __init__(self, isWhitePlayer, playerName=None):
         self.isWhitePlayer = isWhitePlayer
-        self.playerName = playerName
+        if playerName is None:
+            if self.isWhitePlayer:
+                self.playerName = "White"
+            else:
+                self.playerName = "Black"
+        else:
+            self.playerName = playerName
 
     # given a GameState, produces a moveSpecificationString
     # describing the move the player desires to make.

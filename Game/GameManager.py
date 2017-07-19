@@ -1,9 +1,10 @@
-from Game.GameState import GameState
 from Game import TakConstants
+from Game.GameState import GameState
 from Players.UserPlayers.ConsolePlayer import ConsolePlayer
 
 
 class GameManager:
+    roundsLimit = 100000
 
     def __init__(self,
                  whitePlayer,
@@ -22,7 +23,7 @@ class GameManager:
 
     def playGame(self):
         status = TakConstants.ongoing
-        while True:
+        for i in range(GameManager.roundsLimit):
             move = self.whitePlayer.getMove(self.board)
             self.history.append(move)
             self.board = self.board.applyMove(move)
@@ -39,12 +40,18 @@ class GameManager:
             if status != TakConstants.ongoing:
                 break
 
+        if status == TakConstants.ongoing:
+            status = TakConstants.overRounds
+
         if status == TakConstants.whiteWon:
             self.whitePlayer.won()
             self.blackPlayer.lost()
-        else:
+        elif status == TakConstants.blackWon:
             self.whitePlayer.lost()
             self.blackPlayer.won()
+        else:
+            self.whitePlayer.draw()
+            self.blackPlayer.draw()
 
         return self.board, self.history, status
 

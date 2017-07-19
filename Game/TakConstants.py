@@ -9,3 +9,4 @@ whiteWon = 1
 blackWon = -1
 draw = 0
 ongoing = 2
+overRounds = 3
