@@ -1,8 +1,8 @@
 from random import random, choice
 
 from Game.GameState import GameState
+from Players.AIPlayers.TakNet2 import Train
 from Players.AIPlayers.TakNet2.TakNet import TakNet
-from Players.AIPlayers.TakNet2.Train import gamma, epsilon, rememberAll
 from Players.Player import Player
 
 
@@ -27,7 +27,7 @@ class TakticalBot(Player):
     def getMove(self, board: GameState, training=None):
         if training is None:
             training = self.training
-        if training and random() < epsilon:
+        if training and random() < Train.epsilon:
             # do random move for exploration
             move, oppState = choice(board.applyMoves(board.generateMoves()))
             nextState = self.__worstOppMove(oppState)
@@ -37,7 +37,7 @@ class TakticalBot(Player):
         if training:
             # which of these to use? both? todo decide
             # remember what really happened
-            self.remember(board, gamma * self.evaluationTakNet.eval([nextState])[0])
+            self.remember(board, Train.gamma * self.evaluationTakNet.eval([nextState])[0])
             # remember minimax prediction
             self.remember(nextState, self.targetValue(nextState))
 
@@ -92,7 +92,7 @@ class TakticalBot(Player):
             return result   # -1 if white lost, 0 if draw, 1 if white won
         else:
             _, _, nextState = self.evalMoves(state)
-            return gamma * self.evaluationTakNet.eval(self.asExamples([nextState]))[0]
+            return Train.gamma * self.evaluationTakNet.eval(self.asExamples([nextState]))[0]
 
     # add a gameState and it's permutations, with target values, to takNet's training buffer
     def remember(self, gameState, targetValue):
@@ -103,7 +103,7 @@ class TakticalBot(Player):
             permutations.append((permutation, targetValue))
         for permutation in invertedPermutations:
             permutations.append((permutation, -targetValue))
-        rememberAll(permutations)
+        Train.rememberAll(permutations)
 
     def won(self):
         pass

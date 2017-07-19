@@ -17,13 +17,13 @@ batches_per_epoch = 20  # number of batches between saves, checkpoints, etc
 
 
 # add state and target value to training data
-def remember(self, state, stateTargetValue):
-    self.memory.append((state, stateTargetValue))
+def remember(state, stateTargetValue):
+    memory.append((state, stateTargetValue))
 
 
 # add many states and target values to training data
-def rememberAll(self, statesAndTargetValues):
-    self.memory += statesAndTargetValues
+def rememberAll(statesAndTargetValues):
+    memory.extend(statesAndTargetValues)
 
 
 def replay(self, batchSize):

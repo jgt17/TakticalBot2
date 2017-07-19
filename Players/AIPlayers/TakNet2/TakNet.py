@@ -1,8 +1,12 @@
+import pickle
+
 from keras.layers import Input, concatenate
 from keras.layers.convolutional import Conv2D, Conv3D
 from keras.layers.core import Reshape, Dense
 from keras.models import Model
 from numpy import unpackbits
+
+from Players.AIPlayers.TakNet2 import util
 
 
 class TakNet:
@@ -21,6 +25,17 @@ class TakNet:
         self.layer4Size = boardSize * 10
         self.boardMetadataPreprocessingSize = 4
         self.model = self._buildModel(boardSize, weightsToUse)
+        if weightsToUse is not None:
+            self.setWeights(weightsToUse)
+
+    @staticmethod
+    def loadNetwork(boardSize=5, version="latest"):
+        try:
+            weights = pickle.load(util.networkFolder + "/" + util.formatNetworkFileName(boardSize, version))
+            return TakNet(boardSize, weights)
+        except IOError:
+            print("File not found: " + util.networkFolder + "/" + util.formatNetworkFileName(boardSize, version))
+            exit(1)
 
     def _buildModel(self, boardSize, weightsToUse=None):
         # create network
