@@ -23,13 +23,13 @@ class TakNet:
         self.layer3Size = boardSize * 20
         self.layer4Size = boardSize * 10
         self.boardMetadataPreprocessingSize = 4
-        self.model = self._buildModel(boardSize, weightsToUse)
+        self.model = self._buildModel(boardSize)
         if weightsToUse is not None:
             self.setWeights(weightsToUse)
         if training:
             self.model.compile(optimizer=SGD(lr=Train.learning_rate), loss="mean_squared_error", metrics=["accuracy"])
 
-    def _buildModel(self, boardSize, weightsToUse=None):
+    def _buildModel(self, boardSize):
         # create network
         # Board Input
         boardIn = Input((boardSize, boardSize, boardSize + 1, 4))

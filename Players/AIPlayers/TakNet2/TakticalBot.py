@@ -12,12 +12,12 @@ from Players.Player import Player
 class TakticalBot(Player):
 
     # initialize player
-    def __init__(self, isWhitePlayer, playerName=None, boardSize=5, version=None,
+    def __init__(self, isWhitePlayer, playerName=None, boardSize=5, version=None, attempt=None,
                  evaluationWeights=None, selectionWeights=None, training=False,
                  evaluationNetwork=None, selectionNetwork=None):
         super().__init__(isWhitePlayer, playerName)
         if version is not None:
-            weights = util.loadWeights(boardSize, version)
+            weights = util.loadWeights(boardSize, version, attempt)
             self.evaluationTakNet = TakNet(boardSize, weights)
             self.selectionTakNet = TakNet(boardSize, weights)
         else:
@@ -25,7 +25,7 @@ class TakticalBot(Player):
                 self.evaluationTakNet = TakNet(boardSize, evaluationWeights)  # target network
             else:
                 self.evaluationTakNet = evaluationNetwork
-            if evaluationNetwork is None:
+            if selectionNetwork is None:
                 self.selectionTakNet = TakNet(boardSize, selectionWeights)  # "live" network
             else:
                 self.selectionTakNet = selectionNetwork
@@ -44,11 +44,10 @@ class TakticalBot(Player):
             _, move, nextState = self.evalMoves(board)
 
         if training:
-            # which of these to use? both? todo decide
             # remember what really happened
             self.remember(board, Train.gamma * self.evaluationTakNet.eval([nextState])[0])
-            # remember minimax prediction
-            self.remember(nextState, self.targetValue(nextState))
+            # (don't) remember minimax prediction
+            # self.remember(nextState, self.targetValue(nextState))
 
         return move
 
