@@ -20,6 +20,7 @@ batches_per_epoch = 10  # number of batches between saves, checkpoints, etc
 max_epochs = 1000
 
 memory = blist()
+memoryTargetSize = minibatch_size * minibatches_per_batch * batches_per_epoch
 results = dict()
 testSize = 500
 
@@ -68,10 +69,40 @@ def train():
 def trainOnDatabase(filepath, weights):
     # todo
     raise NotImplementedError
+    # while database not empty todo estimate database size, decide if db training should be multiple epochs
+    #
+    # loop minibatches_per_batch
+    # fill memory from database
+    # train on minibatch
+    #
+    # copy weights
+    #
+    # return
 
 
 # train via self-play
 def trainSelfPlay(weights):
+    # loop batches_per_epoch
+    #
+    # loop minibatches_per_batch
+    # fill memory by self play
+    # train on minibatch
+    #
+    # copy weights
+    #
+    # return
+    staticNetwork = TakNet(boardSize, weights, True)
+    dynamicNetwork = TakNet(boardSize, weights, True)
+    for batch in range(batches_per_epoch):
+        for minibatch in range(minibatches_per_batch):
+            refillMemoryBySelfPlay(staticNetwork, dynamicNetwork)
+            replay(dynamicNetwork)
+        staticNetwork.setWeights(dynamicNetwork.getWeights())
+    return staticNetwork
+
+
+# generate examples by playing games until memory has at least memoryTargetSize examples in it
+def refillMemoryBySelfPlay(staticNetwork, dynamicNetwork):
     # todo
     raise NotImplementedError
 
@@ -129,6 +160,7 @@ def saveAndTest(weights, version):
     util.saveWeights(weights, version, attempt)
     test(version)
     util.saveResults(results, boardSize, attempt)
+    # todo save and reload memory
 
 
 # test a version against a random player and each version of the network, including itself
