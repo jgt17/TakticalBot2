@@ -28,6 +28,17 @@ def formatResultsFileName(boardSize, attempt=None):
            "/board_size_" + boardSize + attempt + "_results"
 
 
+def formatMemoryFileName(boardSize, attempt=None):
+    if attempt is None:
+        attemptFolder = ""
+        attempt = ""
+    else:
+        attemptFolder = "/attempt_" + attempt
+        attempt = "_attempt_" + attempt
+    return networkFolder + "/board_size_" + boardSize + attemptFolder + \
+           "/board_size_" + boardSize + attempt + "_memory"
+
+
 def loadWeights(boardSize=5, version=None, attempt=None):
     if version is None:
         version = "latest"
@@ -72,6 +83,24 @@ def saveResults(results, boardSize=5, attempt=None):
         exit(2)
     with open(formatResultsFileName(boardSize, attempt) + "_readable", "w") as f:
         f.write(formatResults(results))
+
+
+def loadMemory(boardSize=5, attempt=None):
+    try:
+        return pickle.load(formatMemoryFileName(boardSize, attempt))
+    except IOError:
+        print("File not found: " + formatMemoryFileName(boardSize, attempt))
+        exit(1)
+
+
+def saveMemory(memory, boardSize=5, attempt=None):
+    try:
+        pickle.dump(memory, formatResultsFileName(boardSize, attempt))
+    except IOError:
+        print("Unable to create file: " + formatResultsFileName(boardSize, attempt))
+        exit(2)
+    with open(formatResultsFileName(boardSize, attempt) + "_readable", "w") as f:
+        f.write(formatResults(memory))
 
 
 def checkIfVersionExists(boardSize, version, attempt=None):

@@ -2,10 +2,13 @@ import random
 
 from blist import blist
 
+from DatabaseProcessing import databaseUtil
 from Game import TakConstants
 from Game.GameManager import GameManager
 from Players.AIPlayers.RandomPlayer import RandomPlayer
-from Players.AIPlayers.TakNet2.TakticalBot import TakticalBot, util, TakNet
+from Players.AIPlayers.TakNet2 import util
+from Players.AIPlayers.TakNet2.TakNet import TakNet
+from Players.AIPlayers.TakNet2.TakticalBot import TakticalBot
 
 # include permutations?
 
@@ -17,18 +20,18 @@ learning_rate = 0.01  # learning rate
 minibatch_size = 1000  # number of elements to train on at a time
 minibatches_per_batch = 100  # number of minibatches between rotating network weights
 batches_per_epoch = 10  # number of batches between saves, checkpoints, etc
-max_epochs = 1000
 
 memory = blist()
 memoryTargetSize = minibatch_size * minibatches_per_batch * batches_per_epoch
+examplesPerEpoch = memoryTargetSize
 results = dict()
 testSize = 500
+max_database_epochs = databaseUtil.getNumberOfExamplesInDatabase() // examplesPerEpoch
+max_epochs = 1000
 
 boardSize = 5
 attempt = None
 verbosity = -3
-
-databaseFileLocation = "RawDatabase"
 
 
 # primary training loop
@@ -39,66 +42,59 @@ databaseFileLocation = "RawDatabase"
 #            if negative, also print results for most recent epoch
 def train():
     # load previous epoch or begin from scratch
-    initialWeights, currentEpoch, previousResults = loadPreviousOrBeginNew()
+    currentWeights, currentEpoch, previousResults, previousMemory = loadPreviousOrBeginNew()
     if previousResults is not None:
         global results
         results = previousResults
+    if previousMemory is not None:
+        global memory
+        memory = previousMemory
 
-    # if beginning from scratch, train on database
-    if currentEpoch < 0:
-        # save board size in results
+    # todo add board size recogition to sql filters
+    # if beginning from scratch, initialize
+    if currentEpoch == -max_database_epochs:
+        # save board size and attempt in results
         results["boardSize"] = boardSize
+        results["attempt"] = attempt
 
-        saveAndTest(initialWeights, currentEpoch)
-        newWeights = trainOnDatabase(databaseFileLocation, initialWeights)
+        saveAndTest(currentWeights, currentEpoch)
         currentEpoch += 1
-        saveAndTest(newWeights, currentEpoch)
+
+    # train from database examples
+    while currentEpoch < 0:
+        currentEpoch += 1
+        currentWeights = trainOnDatabase(currentWeights)
+        saveAndTest(currentWeights, currentEpoch)
         printEpochUpdate(currentEpoch)
-    else:
-        newWeights = initialWeights
 
     # train by self-play after training on database
     while currentEpoch <= max_epochs:
         currentEpoch += 1
-        newWeights = trainSelfPlay(newWeights)
-        saveAndTest(newWeights, currentEpoch)
-    printEpochUpdate(currentEpoch)
+        currentWeights = trainSelfPlay(currentWeights)
+        saveAndTest(currentWeights, currentEpoch)
+        printEpochUpdate(currentEpoch)
 
 
 # train on database examples
-def trainOnDatabase(filepath, weights):
-    # todo
-    raise NotImplementedError
-    # while database not empty todo estimate database size, decide if db training should be multiple epochs
-    #
-    # loop minibatches_per_batch
-    # fill memory from database
-    # train on minibatch
-    #
-    # copy weights
-    #
-    # return
+def trainOnDatabase(weights):
+    return trainForOneEpoch(weights, refillMemoryFromDatabase)
 
 
 # train via self-play
 def trainSelfPlay(weights):
-    # loop batches_per_epoch
-    #
-    # loop minibatches_per_batch
-    # fill memory by self play
-    # train on minibatch
-    #
-    # copy weights
-    #
-    # return
-    staticNetwork = TakNet(boardSize, weights, True)
-    dynamicNetwork = TakNet(boardSize, weights, True)
+    return trainForOneEpoch(weights, refillMemoryBySelfPlay)
+
+
+# train for one epoch, using the specified refillFunction to fill the memory with new examples
+def trainForOneEpoch(initialWeights, refillFunction):
+    staticNetwork = TakNet(boardSize, initialWeights, True)
+    dynamicNetwork = TakNet(boardSize, initialWeights, True)
     for batch in range(batches_per_epoch):
         for minibatch in range(minibatches_per_batch):
-            refillMemoryBySelfPlay(staticNetwork, dynamicNetwork)
+            refillFunction(staticNetwork, dynamicNetwork)
             replay(dynamicNetwork)
         staticNetwork.setWeights(dynamicNetwork.getWeights())
-    return staticNetwork
+    return staticNetwork.getWeights()
 
 
 # generate examples by playing games until memory has at least memoryTargetSize examples in it
@@ -107,22 +103,30 @@ def refillMemoryBySelfPlay(staticNetwork, dynamicNetwork):
     raise NotImplementedError
 
 
+def refillMemoryFromDatabase(staticNetwork, dynamicNetwork):
+    # todo
+    raise NotImplementedError
+
+
 # load the most recent epoch and results for the specified attempt,
 # or initialize if no epochs have been saved in this attempt
 def loadPreviousOrBeginNew():
-    if util.checkIfVersionExists(boardSize, -1, attempt):
+    if util.checkIfVersionExists(boardSize, -max_database_epochs, attempt):
         return loadPrevious()
     else:
-        return TakNet(boardSize).getWeights(), -1, None
+        return TakNet(boardSize).getWeights(), -max_database_epochs, None, None
 
 
 # load the most recent epoch and results for the specified attempt
 def loadPrevious():
-    epoch = -1
+    epoch = -max_database_epochs
     while util.checkIfVersionExists(boardSize, epoch, attempt):
         epoch += 1
     epoch -= 1
-    return util.loadWeights(boardSize, epoch, attempt), epoch, util.loadResults(boardSize, attempt)
+    return util.loadWeights(boardSize, epoch, attempt), \
+           epoch, \
+           util.loadResults(boardSize, attempt), \
+           util.loadMemory(boardSize, attempt)
 
 
 # format and print the update between epochs
@@ -160,7 +164,7 @@ def saveAndTest(weights, version):
     util.saveWeights(weights, version, attempt)
     test(version)
     util.saveResults(results, boardSize, attempt)
-    # todo save and reload memory
+    util.saveMemory(memory, boardSize, attempt)
 
 
 # test a version against a random player and each version of the network, including itself

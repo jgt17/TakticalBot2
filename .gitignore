@@ -3,7 +3,8 @@ tak_train*/
 trained_models/
 NetworkReadyGameStateRepresentations/
 ParsedGameStates/
-RawDatabase/
+Database/*
+!Database/Raw
 PermutedGameStates/
 __pycache__/
 .idea/

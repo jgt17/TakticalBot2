@@ -1,0 +1,2 @@
+SELECT count(*) FROM games
+WHERE size=5 AND (result = "R-0" OR result = "0-R" OR result = "F-0" OR result = "0-F" OR result = "1/2=1/2")
