@@ -6,9 +6,6 @@ from Players.AIPlayers.TakNet2.TakNet import TakNet
 from Players.Player import Player
 
 
-# todo decide where to store training variables
-
-
 class TakticalBot(Player):
 
     # initialize player

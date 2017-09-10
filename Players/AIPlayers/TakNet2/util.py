@@ -108,13 +108,15 @@ def checkIfVersionExists(boardSize, version, attempt=None):
 
 
 # converts results to a nice readable string
-def formatResults(results):
+def formatResults(results, attempt=None):
     # todo
     raise NotImplementedError
 
 
 # converts results to a nice readable string, filtered according to the provided parameters
-def formatPartialResults(results, attempt, version1, version2=None, asWhichPlayer=None, outcomes=None):
+def formatPartialResults(results, version1, attempt=None, version2=None, asWhichPlayer=None, outcomes=None):
     # todo
     # todo add support for opponent version, asWhichPlayer, and results
     raise NotImplementedError
+
+# results structure: version1;version2;(asWhite|asBlack);(won|drawn|lost|unfinished)

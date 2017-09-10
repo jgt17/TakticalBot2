@@ -9,29 +9,16 @@ from Players.AIPlayers.RandomPlayer import RandomPlayer
 from Players.AIPlayers.TakNet2 import util
 from Players.AIPlayers.TakNet2.TakNet import TakNet
 from Players.AIPlayers.TakNet2.TakticalBot import TakticalBot
+from Players.AIPlayers.TakNet2.config import examplesPerEpoch, testSize, max_epochs, boardSize, attempt, verbosity
+# import config
+from Players.AIPlayers.TakNet2.config import minibatch_size
+from Players.AIPlayers.TakNet2.config import minibatches_per_batch, batches_per_epoch
 
 # include permutations?
 
-gamma = 0.95  # discount rate
-epsilon = 1.0  # exploration rate
-epsilon_min = 0.01  # min exploration rate
-epsilon_decay = 0.995  # exploration rate decay rate
-learning_rate = 0.01  # learning rate
-minibatch_size = 1000  # number of elements to train on at a time
-minibatches_per_batch = 100  # number of minibatches between rotating network weights
-batches_per_epoch = 10  # number of batches between saves, checkpoints, etc
-
 memory = blist()
-memoryTargetSize = minibatch_size * minibatches_per_batch * batches_per_epoch
-examplesPerEpoch = memoryTargetSize
 results = dict()
-testSize = 500
 max_database_epochs = databaseUtil.getNumberOfExamplesInDatabase() // examplesPerEpoch
-max_epochs = 1000
-
-boardSize = 5
-attempt = None
-verbosity = -3
 
 
 # primary training loop
@@ -50,7 +37,6 @@ def train():
         global memory
         memory = previousMemory
 
-    # todo add board size recogition to sql filters
     # if beginning from scratch, initialize
     if currentEpoch == -max_database_epochs:
         # save board size and attempt in results
